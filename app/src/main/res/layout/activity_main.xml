@@ -20,8 +20,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
+            android:layout_height="match_parent">
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/btn_open_menu"
@@ -85,10 +84,9 @@
             android:id="@+id/navigation_view"
             android:layout_width="300dp"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
             android:background="?attr/colorSurface"
             android:clickable="true"
-            android:fitsSystemWindows="true"
+            android:layout_gravity="start"
             android:focusable="true"
             android:orientation="vertical">
 

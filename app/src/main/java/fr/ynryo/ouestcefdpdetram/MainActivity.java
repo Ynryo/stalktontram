@@ -36,6 +36,7 @@ import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.ouestcefdpdetram.managers.CompassManager;
 import fr.ynryo.ouestcefdpdetram.managers.FetchingManager;
 import fr.ynryo.ouestcefdpdetram.managers.FollowManager;
+import fr.ynryo.ouestcefdpdetram.managers.LayoutManager;
 import fr.ynryo.ouestcefdpdetram.managers.SaveManager;
 import fr.ynryo.ouestcefdpdetram.managers.favorite.FavoriteManager;
 
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FollowManager followManager;
     private FavoriteManager favoriteManager;
     private SaveManager saveManager;
+    private LayoutManager layoutManager;
 
     private boolean isMapReady = false;
     private boolean isDataReady = false;
@@ -75,11 +77,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationClient;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        layoutManager = new LayoutManager(this);
+        layoutManager.setupWindowInsets();
 
         saveManager = new SaveManager(this);
         fetcher = new FetchingManager(this);
@@ -181,6 +185,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         isMapReady = true;
         onEverythingReady();
+    }
+
+    public int dpToPx(int dp) {
+        return LayoutManager.dpToPx(this, dp);
     }
 
     @Override

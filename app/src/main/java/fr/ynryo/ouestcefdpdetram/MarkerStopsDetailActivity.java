@@ -23,6 +23,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -86,18 +90,40 @@ public class MarkerStopsDetailActivity {
 
     // ==================== SETUP ====================
     private void setupBottomSheetAppearance(View view) {
+        if (bottomSheetDialog.getWindow() != null) {
+            WindowCompat.setDecorFitsSystemWindows(bottomSheetDialog.getWindow(), false);
+        }
+
         bottomSheetDialog.setOnShowListener(dialog -> {
             BottomSheetDialog d = (BottomSheetDialog) dialog;
             View bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
 
             if (bottomSheet != null) {
                 bottomSheet.setBackgroundResource(android.R.color.transparent);
+                ViewCompat.setOnApplyWindowInsetsListener(bottomSheet, (v, insets) -> insets);
                 BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
 
                 int peekHeight = calculatePeekHeight();
                 behavior.setPeekHeight(peekHeight);
                 behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, windowInsets) -> {
+            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            View nsvContent = view.findViewById(R.id.nsvContent);
+            if (nsvContent != null && context != null) {
+                nsvContent.setPadding(
+                        nsvContent.getPaddingLeft(),
+                        nsvContent.getPaddingTop(),
+                        nsvContent.getPaddingRight(),
+                        insets.bottom + context.dpToPx(16)
+                );
+                if (nsvContent instanceof androidx.core.widget.NestedScrollView) {
+                    ((androidx.core.widget.NestedScrollView) nsvContent).setClipToPadding(false);
+                }
+            }
+            return windowInsets;
         });
     }
 
