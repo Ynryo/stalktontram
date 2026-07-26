@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -13,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.markers.MarkerData;
-import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.train.TrainData;
-import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.train.TrainFeature;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.vehicle.VehicleData;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.vehicle.VehicleStop;
 import fr.ynryo.ouestcefdpdetram.utils.Time;
@@ -165,53 +162,6 @@ public class MarkerDataStandardized {
                     stop.setStopType(StopType.NO_DROPOFF);
                 } else {
                     stop.setStopType(StopType.BOTH);
-                }
-                Log.i(TAG, stop.toString());
-                this.stops.add(stop);
-            }
-        }
-
-        this.detailsLoaded = true;
-        this.lastUpdatedAt = Instant.now();
-    }
-
-    /**
-     * Sets the train-related details for the vehicle using the provided train data.
-     *
-     * @param trainData The TrainData object containing route features and associated train information.
-     * @throws ParseException If an error occurs while parsing the train data (e.g. date/time format issues).
-     */
-    // n'a pas la priorité, complete juste (trains)
-    public void setVehicleDetailsTrainData(@NonNull TrainData trainData) throws ParseException {
-        List<TrainFeature> trainFeatureList = trainData.getRouteFeatures();
-        if (trainFeatureList != null && !trainFeatureList.isEmpty()) {
-            this.destination = trainData.getDestination();
-            this.networkId = NETWORK_ID_SNCF;
-            this.stops = new ArrayList<>();
-            for (int i = 0; i < trainFeatureList.size(); i++) {
-                TrainFeature trainFeature = trainFeatureList.get(i);
-
-                if (trainFeature.getProperties().isRoute()) {
-                    this.markerDataRoute = trainFeature.getRouteGeometry().getCoordinates();
-                    continue;
-                }
-                if (!trainFeature.getProperties().isStop()) continue; // si c'est pas un arrêt c'est oust
-
-                MarkerDataStop stop = new MarkerDataStop();
-                try {
-                    stop.setStopOrder(trainFeature.getProperties().getEtape());
-                    stop.setStopRef(trainFeature.getProperties().getUic());
-                    stop.setStopName(trainFeature.getProperties().getLocalite());
-//                stop.setPlatformName(trainFeature.getPlatformName()); // TODO: à ajouter avec l'api carto tchoo guestplatform
-                    stop.setOnLive(true);
-                    stop.setDelay((long) trainFeature.getProperties().getDelay());
-                    stop.setArrivalTime(trainFeature.getProperties().getDebut());
-                    stop.setDepartureTime(trainFeature.getProperties().getFin());
-                    stop.setIsDestinationStop(trainData.isDestinationStop(trainFeature.getProperties().getLocalite()));
-                    stop.setIsDepartureStop(trainData.isDepartureStop(trainFeature.getProperties().getLocalite()));
-                    stop.setVehicle(this);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
                 Log.i(TAG, stop.toString());
                 this.stops.add(stop);

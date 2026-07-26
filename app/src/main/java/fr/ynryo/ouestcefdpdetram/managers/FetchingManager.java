@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.net.URLEncoder;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +17,6 @@ import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.markers.MarkerData;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.markers.MarkersList;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.network.NetworkData;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.region.RegionData;
-import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.train.TrainData;
-import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.train.TrainFeature;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.vehicle.VehicleData;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.version.VersionResponse;
 import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.MarkerDataStandardized;
@@ -37,12 +34,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class FetchingManager {
     private static final String TAG = "FetchingManager";
     private static final String BASE_URL_BUS_TRACKER = "https://bus-tracker.fr/api/";
-    private static final String BASE_URL_CARTO_TCHOO = "https://api.tchoo.net/api/";
     private static final String BASE_URL_DL_YNRYO = "https://dl.ynryo.fr/api/ouestcefdpdetram/";
 
     private final MainActivity context;
     private static ApiService busTrackerService;
-    private static ApiService cartoTchooService;
     private static ApiService dlYnryoService;
 
     public FetchingManager(MainActivity context) {
@@ -53,14 +48,6 @@ public class FetchingManager {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             busTrackerService = retrofit.create(ApiService.class);
-        }
-
-        if (cartoTchooService == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL_CARTO_TCHOO)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            cartoTchooService = retrofit.create(ApiService.class);
         }
 
         if (dlYnryoService == null) {
@@ -117,9 +104,6 @@ public class FetchingManager {
         switch (baseUrl) {
             case BASE_URL_BUS_TRACKER:
                 return busTrackerService;
-
-            case BASE_URL_CARTO_TCHOO:
-                return cartoTchooService;
 
             case BASE_URL_DL_YNRYO:
                 return dlYnryoService;
@@ -190,51 +174,25 @@ public class FetchingManager {
                 fetchVehicleStopsInfo(markerDataStandardized.getUmB(), umListener);
                 return;
             }
-            if (markerDataStandardized.isVehicle()) {
-                String encodedId = URLEncoder.encode(markerDataStandardized.getId(), "UTF-8");
-                getService(BASE_URL_BUS_TRACKER).getVehicleDetails(encodedId).enqueue(new Callback<>() {
-                    @Override
-                    public void onResponse(@NonNull Call<VehicleData> call, @NonNull Response<VehicleData> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            VehicleData vehicleData = response.body();
-                            markerDataStandardized.setVehicleDetailsVehicleData(vehicleData);
-                            listener.onResponseVehicleDetailsListener(markerDataStandardized);
-                        } else {
-                            listener.onErrorVehicleDetailsListener(String.valueOf(response.code()));
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(@NonNull Call<VehicleData> call, @NonNull Throwable t) {
-                        listener.onErrorVehicleDetailsListener(t.getMessage());
+            String encodedId = URLEncoder.encode(markerDataStandardized.getId(), "UTF-8");
+            getService(BASE_URL_BUS_TRACKER).getVehicleDetails(encodedId).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<VehicleData> call, @NonNull Response<VehicleData> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        VehicleData vehicleData = response.body();
+                        markerDataStandardized.setVehicleDetailsVehicleData(vehicleData);
+                        listener.onResponseVehicleDetailsListener(markerDataStandardized);
+                    } else {
+                        listener.onErrorVehicleDetailsListener(String.valueOf(response.code()));
                     }
-                });
-            } else if (markerDataStandardized.isTrain()) {
-                getService(BASE_URL_CARTO_TCHOO).getVehicleDetails(Integer.parseInt(markerDataStandardized.getLineNumber())).enqueue(new Callback<>() {
-                    @Override
-                    public void onResponse(@NonNull Call<TrainData> call, @NonNull Response<TrainData> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            TrainData trainData = response.body();
-                            for(TrainFeature trainFeature : trainData.getRouteFeatures()) {
-                                Log.i(TAG, trainFeature.getProperties().toString());
-                            }
-                            try {
-                                markerDataStandardized.setVehicleDetailsTrainData(trainData);
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
-                            }
-                            listener.onResponseVehicleDetailsListener(markerDataStandardized);
-                        } else {
-                            listener.onErrorVehicleDetailsListener(String.valueOf(response.code()));
-                        }
-                    }
+                }
 
-                    @Override
-                    public void onFailure(@NonNull Call<TrainData> call, @NonNull Throwable t) {
-                        listener.onErrorVehicleDetailsListener(t.getMessage());
-                    }
-                });
-            }
+                @Override
+                public void onFailure(@NonNull Call<VehicleData> call, @NonNull Throwable t) {
+                    listener.onErrorVehicleDetailsListener(t.getMessage());
+                }
+            });
 
         } catch (Exception e) {
             listener.onErrorVehicleDetailsListener(e.getMessage());
@@ -243,7 +201,7 @@ public class FetchingManager {
 
     // ==================== FETCH NETWORK DATA ====================
     public void fetchNetworkData(int networkId, OnNetworkDataListener listener) {
-        getService(BASE_URL_BUS_TRACKER).getNetworkData(networkId).enqueue(new Callback<NetworkData>() {
+        getService(BASE_URL_BUS_TRACKER).getNetworkData(networkId).enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<NetworkData> call, @NonNull Response<NetworkData> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -266,7 +224,7 @@ public class FetchingManager {
             Log.d(TAG, markerDataStandardized.getPathRef());
             String encodedPathRef = URLEncoder.encode(markerDataStandardized.getPathRef(), "UTF-8");
             Log.d(TAG, encodedPathRef);
-            getService(BASE_URL_BUS_TRACKER).getBusLine(encodedPathRef).enqueue(new Callback<BusGeometry>() {
+            getService(BASE_URL_BUS_TRACKER).getBusLine(encodedPathRef).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<BusGeometry> call, @NonNull Response<BusGeometry> response) {
                     if (response.isSuccessful() && response.body() != null) {
@@ -290,7 +248,7 @@ public class FetchingManager {
     // ==================== FETCH NETWORKS ====================
     public void fetchNetworks(OnNetworkListener listener) {
         try {
-            getService(BASE_URL_BUS_TRACKER).getNetworks().enqueue(new Callback<List<NetworkData>>() {
+            getService(BASE_URL_BUS_TRACKER).getNetworks().enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<List<NetworkData>> call, @NonNull Response<List<NetworkData>> response) {
                     if (response.isSuccessful() && response.body() != null) {
@@ -313,7 +271,7 @@ public class FetchingManager {
     // ==================== FETCH REGIONS ====================
     public void fetchRegions(OnRegionsListener listener) {
         try {
-            getService(BASE_URL_BUS_TRACKER).getRegions().enqueue(new Callback<List<RegionData>>() {
+            getService(BASE_URL_BUS_TRACKER).getRegions().enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<List<RegionData>> call, @NonNull Response<List<RegionData>> response) {
                     if (response.isSuccessful() && response.body() != null) {
@@ -336,7 +294,7 @@ public class FetchingManager {
     // ==================== FETCH VERSION ====================
     public void fetchLatestVersion(OnVersionListener listener) {
         try {
-            getService(BASE_URL_DL_YNRYO).getLatestVersion().enqueue(new Callback<VersionResponse>() {
+            getService(BASE_URL_DL_YNRYO).getLatestVersion().enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<VersionResponse> call, @NonNull Response<VersionResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
@@ -359,7 +317,7 @@ public class FetchingManager {
     // ==================== FETCH IS ALIVE VERSION ====================
     public void fetchVehicleAlive(String vehicleId, OnVehicleAliveListener listener) {
         try {
-            getService(BASE_URL_BUS_TRACKER).getVehicleDetails(vehicleId).enqueue(new Callback<VehicleData>() {
+            getService(BASE_URL_BUS_TRACKER).getVehicleDetails(vehicleId).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<VehicleData> call, @NonNull Response<VehicleData> response) {
                     listener.onResponseVehicleAliveListener(response.code() == 200);

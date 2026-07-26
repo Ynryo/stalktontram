@@ -560,7 +560,7 @@ public class MarkerStopsDetailActivity {
                 vh.tvAtStopTime.setText(atStopMinutes + "min d'arrêt");
                 vh.tvAtStopTime.setTextColor(Color.GRAY);
             } else {
-                vh.tvAtStopTime.setText("—");
+                vh.tvAtStopTime.setVisibility(View.GONE);
             }
         }
 
@@ -937,8 +937,7 @@ public class MarkerStopsDetailActivity {
                     tvAtStop.setText(atStopMinutes + "min d'arrêt");
                     tvAtStop.setTextColor(Color.GRAY);
                 } else {
-                    tvAtStop.setText("—");
-                    tvAtStop.setVisibility(View.VISIBLE);
+                    tvAtStop.setVisibility(View.GONE);
                 }
             }
 

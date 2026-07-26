@@ -6,7 +6,6 @@ import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.bus.BusGeometry;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.markers.MarkersList;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.network.NetworkData;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.region.RegionData;
-import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.train.TrainData;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.vehicle.VehicleData;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.version.VersionResponse;
 import retrofit2.Call;
@@ -38,11 +37,6 @@ public interface ApiService {
     @GET("vehicle-journeys/{vehicleId}")
     Call<VehicleData> getVehicleDetails(
         @Path(value = "vehicleId", encoded = true) String vehicleId
-    );
-
-    @GET("carto.php?action=train")
-    Call<TrainData> getVehicleDetails(
-        @Query("numero") int vehicleNumber
     );
 
     @GET("regions")
