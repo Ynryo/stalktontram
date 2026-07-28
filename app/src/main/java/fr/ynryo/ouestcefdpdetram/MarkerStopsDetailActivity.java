@@ -318,7 +318,7 @@ public class MarkerStopsDetailActivity {
     }
 
     private static int getTimelineLayout(MarkerDataStop stop, int position, int itemCount) {
-        boolean isFirstStop = position == 0 || stop.isDepartureStop();
+        boolean isFirstStop = stop.isDepartureStop();
         boolean isLastStop = position == itemCount - 1 || stop.isDestinationStop();
         if (isFirstStop) {
             return R.layout.timeline_first_stop;

@@ -144,7 +144,7 @@ public class MarkerDataStandardized {
                 stop.setLongitude(vehicleStop.getLongitude());
                 stop.setLatitude(vehicleStop.getLatitude());
                 stop.setDistanceTraveled(vehicleStop.getDistanceTraveled());
-                stop.setIsDepartureStop(vehicleStop.getDistanceTraveled() == 0 || i == 0);
+                stop.setIsDepartureStop(vehicleStop.getDistanceTraveled() == 0);
                 stop.setIsDestinationStop(i == vehicleData.getCalls().size() - 1);
                 stop.setVehicle(this);
 

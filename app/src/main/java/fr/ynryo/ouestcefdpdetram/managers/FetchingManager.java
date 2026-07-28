@@ -178,6 +178,7 @@ public class FetchingManager {
                     if (response.isSuccessful() && response.body() != null) {
                         VehicleData vehicleData = response.body();
                         markerDataStandardized.setVehicleDetailsVehicleData(vehicleData);
+                        Log.d(TAG, String.valueOf(markerDataStandardized));
                         listener.onResponseVehicleDetailsListener(markerDataStandardized);
                     } else {
                         listener.onErrorVehicleDetailsListener(String.valueOf(response.code()));
