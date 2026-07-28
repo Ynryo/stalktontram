@@ -21,7 +21,7 @@ public enum MarkerType {
      * @param markerId L'ID du marqueur
      * @return TRAIN si l'ID commence par "SNCF", sinon c'est un BUS_TRAM
      */
-    public static MarkerType fromMarkerId(String markerId) {
+    public static MarkerType guestFromMarkerId(String markerId) {
         if (markerId != null && markerId.startsWith("SNCF")) {
             return TRAIN;
         }

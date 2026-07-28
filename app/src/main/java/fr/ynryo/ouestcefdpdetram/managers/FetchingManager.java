@@ -30,6 +30,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Classe gérant les requêtes et réponses de l'API et les conversions avec MarkerDataStandardized
+ *
+ * Author: Ynryo
  */
 public class FetchingManager {
     private static final String TAG = "FetchingManager";
@@ -43,18 +45,12 @@ public class FetchingManager {
     public FetchingManager(MainActivity context) {
         this.context = context;
         if (busTrackerService == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL_BUS_TRACKER)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL_BUS_TRACKER).addConverterFactory(GsonConverterFactory.create()).build();
             busTrackerService = retrofit.create(ApiService.class);
         }
 
         if (dlYnryoService == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL_DL_YNRYO)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL_DL_YNRYO).addConverterFactory(GsonConverterFactory.create()).build();
             dlYnryoService = retrofit.create(ApiService.class);
         }
     }
@@ -62,41 +58,49 @@ public class FetchingManager {
     // ==================== LISTENERS ====================
     public interface OnMarkersListener {
         void onResponseMarkersListener(List<MarkerDataStandardized> markerDataStandardizedList);
+
         void onErrorMarkersListener(String error);
     }
 
     public interface OnVehicleDetailsListener {
         void onResponseVehicleDetailsListener(MarkerDataStandardized markerDataStandardized);
+
         void onErrorVehicleDetailsListener(String error);
     }
 
     public interface OnNetworkDataListener {
         void onResponseNetworkDataListener(NetworkData data);
+
         void onErrorNetworkDataListener(String error);
     }
 
     public interface OnRouteLineListener {
         void onResponseRouteLineListener(MarkerDataStandardized data);
+
         void onErrorRouteLineListener(String error);
     }
 
     public interface OnNetworkListener {
         void onResponseNetworkListener(List<NetworkData> data);
+
         void onErrorNetworkListener(String error);
     }
 
     public interface OnRegionsListener {
         void onResponseRegionsListener(List<RegionData> regions);
+
         void onErrorRegionsListener(String error);
     }
 
     public interface OnVersionListener {
         void onResponseVersionListener(VersionResponse version);
+
         void onErrorVersionListener(String error);
     }
 
     public interface OnVehicleAliveListener {
         void onResponseVehicleAliveListener(boolean isAlive);
+
         void onErrorVehicleAliveListener(String error);
     }
 
@@ -122,20 +126,12 @@ public class FetchingManager {
         if (context.getMap() == null) return;
 
         LatLngBounds bounds = context.getMap().getProjection().getVisibleRegion().latLngBounds;
-        getService(BASE_URL_BUS_TRACKER).getVehicleMarkers(
-                bounds.southwest.latitude,
-                bounds.southwest.longitude,
-                bounds.northeast.latitude,
-                bounds.northeast.longitude,
-                lineId
-        ).enqueue(new Callback<>() {
+        getService(BASE_URL_BUS_TRACKER).getVehicleMarkers(bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude, lineId).enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<MarkersList> call, @NonNull Response<MarkersList> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // Convertir MarkerData en MarkerDataStandardized
-                    List<MarkerDataStandardized> standardizedMarkers = convertMarkerDataList(
-                            response.body().getItems()
-                    );
+                    List<MarkerDataStandardized> standardizedMarkers = convertMarkerDataList(response.body().getItems());
                     listener.onResponseMarkersListener(standardizedMarkers);
                 } else {
                     listener.onErrorMarkersListener("Erreur réponse: " + response.code());
@@ -337,14 +333,12 @@ public class FetchingManager {
     private List<MarkerDataStandardized> convertMarkerDataList(List<MarkerData> markerDataList) {
         List<MarkerDataStandardized> result = new ArrayList<>();
 
-        if (markerDataList == null || markerDataList.isEmpty()) {
-            return result;
-        }
+        if (markerDataList == null || markerDataList.isEmpty()) return result;
 
         for (MarkerData markerData : markerDataList) {
             try {
-                MarkerType type = MarkerType.fromMarkerId(markerData.getId()); //determiner type
-                MarkerDataStandardized standardized = MarkerDataStandardized.from(markerData, type); //on convert
+                MarkerType type = MarkerType.guestFromMarkerId(markerData.getId()); //determiner type
+                MarkerDataStandardized standardized = MarkerDataStandardized.createNewMarkerFrom(markerData, type); //on convert
 
                 result.add(standardized);
             } catch (Exception e) {

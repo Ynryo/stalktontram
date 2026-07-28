@@ -65,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private CompassManager compassManager;
     private FollowManager followManager;
     private FavoriteManager favoriteManager;
-    private SaveManager saveManager;
-    private LayoutManager layoutManager;
 
     private boolean isMapReady = false;
     private boolean isDataReady = false;
@@ -82,10 +80,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        layoutManager = new LayoutManager(this);
+        LayoutManager layoutManager = new LayoutManager(this);
         layoutManager.setupWindowInsets();
 
-        saveManager = new SaveManager(this);
+        SaveManager saveManager = new SaveManager(this);
         fetcher = new FetchingManager(this);
         lateralDrawerActivity = new LateralDrawerActivity(this, saveManager);
         compassManager = new CompassManager(this);
@@ -301,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void fetchMarkers() {
-        if (isFetching) return;
+        if (isFetching) return; //pour eviter le double fetching qui corromps les données
         isFetching = true;
 
         fetcher.fetchMarkers(new FetchingManager.OnMarkersListener() {
@@ -309,9 +307,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onResponseMarkersListener(List<MarkerDataStandardized> markerDataStandardizedList) {
                 isFetching = false;
                 markerArtist.showMarkers(markerDataStandardizedList);
-                if (markerArtist.getMarkerIconCache().size() > 200) {
+                if (markerArtist.getMarkerIconCache().size() > 200)
                     markerArtist.getMarkerIconCache().clear();
-                }
             }
 
             @Override

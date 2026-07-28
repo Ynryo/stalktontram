@@ -74,12 +74,7 @@ public class LayoutManager {
             // 4. Navigation View (Drawer content padding)
             View navigationView = activity.findViewById(R.id.navigation_view);
             if (navigationView != null) {
-                navigationView.setPadding(
-                        navigationView.getPaddingLeft(),
-                        systemBars.top,
-                        navigationView.getPaddingRight(),
-                        systemBars.bottom
-                );
+                navigationView.setPadding(navigationView.getPaddingLeft(), systemBars.top, navigationView.getPaddingRight(), systemBars.bottom);
             }
 
             return windowInsets;
