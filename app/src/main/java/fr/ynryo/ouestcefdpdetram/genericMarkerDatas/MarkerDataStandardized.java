@@ -1,13 +1,8 @@
 package fr.ynryo.ouestcefdpdetram.genericMarkerDatas;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +40,8 @@ public class MarkerDataStandardized {
 
     // ==================== MÉTADONNÉES ====================
     private boolean isFollowed; // Est-ce que l'utilisateur suit ce véhicule?
-    private Instant createdAt; // Quand ce marqueur a été créé
-    private Instant lastUpdatedAt; // Quand la position a été mise à jour
+    private Time createdAt; // Quand ce marqueur a été créé
+    private Time lastUpdatedAt; // Quand la position a été mise à jour
     private boolean detailsLoaded; // Les infos détaillées (stops) ont-ils été fetched?
 
     // ==================== SI TRAIN EN UM ====================
@@ -59,8 +54,8 @@ public class MarkerDataStandardized {
     // ==================== CONSTRUCTEURS ====================
     public MarkerDataStandardized() {
         this.stops = new ArrayList<>();
-        this.createdAt = Instant.now();
-        this.lastUpdatedAt = Instant.now();
+        this.createdAt = Time.now();
+        this.lastUpdatedAt = Time.now();
         this.isFollowed = false;
         this.detailsLoaded = false;
     }
@@ -75,7 +70,7 @@ public class MarkerDataStandardized {
      * @return a {@link MarkerDataStandardized} object populated with the data from the given {@link MarkerData} and the specified {@link MarkerType
      * }
      */
-    public static MarkerDataStandardized from(@NonNull MarkerData markerData, @NonNull MarkerType type) {
+    public static MarkerDataStandardized createNewMarkerFrom(@NonNull MarkerData markerData, @NonNull MarkerType type) {
         MarkerDataStandardized marker = new MarkerDataStandardized();
 
         marker.markerType = type;
@@ -88,8 +83,8 @@ public class MarkerDataStandardized {
         marker.latitude = markerData.getPosition().getLatitude();
         marker.longitude = markerData.getPosition().getLongitude();
         marker.bearing = markerData.getPosition().getBearing();
-        marker.createdAt = Instant.now();
-        marker.lastUpdatedAt = Instant.now();
+        marker.createdAt = Time.now();
+        marker.lastUpdatedAt = Time.now();
         marker.detailsLoaded = false;
 
         return marker;
@@ -103,8 +98,8 @@ public class MarkerDataStandardized {
      * @param type         the type of marker to be used for standardization, must not be null
      * @return a new instance of {@code MarkerDataStandardized} containing the standardized marker data
      */
-    public static MarkerDataStandardized from(@NonNull MarkerData markerData, @NonNull VehicleData vehicleData, @NonNull MarkerType type) {
-        MarkerDataStandardized marker = from(markerData, type);
+    public static MarkerDataStandardized createNewMarkerFrom(@NonNull MarkerData markerData, @NonNull VehicleData vehicleData, @NonNull MarkerType type) {
+        MarkerDataStandardized marker = createNewMarkerFrom(markerData, type);
         marker.setVehicleDetailsVehicleData(vehicleData);
         return marker;
     }
@@ -138,22 +133,19 @@ public class MarkerDataStandardized {
                 stop.setStopRef(vehicleStop.getStopRef());
                 stop.setStopName(vehicleStop.getStopName());
                 stop.setPlatformName(vehicleStop.getPlatformName());
-                stop.setOnLive(vehicleStop.getExpectedTime() != null);
-                if (stop.isOnLive()) {
-                    ZonedDateTime expected = ZonedDateTime.parse(vehicleStop.getExpectedTime());
-                    ZonedDateTime aimed = ZonedDateTime.parse(vehicleStop.getAimedTime());
-                    Long delay = ChronoUnit.MINUTES.between(aimed, expected);
-                    stop.setDelay(delay);
+                Time aimedTime = Time.parse(vehicleStop.getAimedTime());
+                Time expectedTime = Time.parse(vehicleStop.getExpectedTime());
+                boolean onLive = expectedTime != null;
 
-                    stop.setDepartureTime(Time.parseToLocalTime(vehicleStop.getExpectedTime()));
-                } else {
-                    stop.setDepartureTime(Time.parseToLocalTime(vehicleStop.getAimedTime()));
-                }
+                stop.setOnLive(onLive);
+                stop.setDelay(Time.calculateDelayMinutes(aimedTime, expectedTime));
+                stop.setDepartureTime(onLive ? expectedTime : aimedTime);
                 stop.setStopOrder(vehicleStop.getStopOrder());
                 stop.setLongitude(vehicleStop.getLongitude());
                 stop.setLatitude(vehicleStop.getLatitude());
                 stop.setDistanceTraveled(vehicleStop.getDistanceTraveled());
-                stop.setIsDepartureStop(vehicleStop.getDistanceTraveled() == 0);
+                stop.setIsDepartureStop(vehicleStop.getDistanceTraveled() == 0 || i == 0);
+                stop.setIsDestinationStop(i == vehicleData.getCalls().size() - 1);
                 stop.setVehicle(this);
 
                 if (vehicleStop.getFlags().contains("NO_PICKUP")) {
@@ -163,13 +155,13 @@ public class MarkerDataStandardized {
                 } else {
                     stop.setStopType(StopType.BOTH);
                 }
-                Log.i(TAG, stop.toString());
+
                 this.stops.add(stop);
             }
         }
 
         this.detailsLoaded = true;
-        this.lastUpdatedAt = Instant.now();
+        this.lastUpdatedAt = Time.now();
     }
 
     // ==================== GETTERS ====================
@@ -237,11 +229,11 @@ public class MarkerDataStandardized {
         return isFollowed;
     }
 
-    public Instant getCreatedAt() {
+    public Time getCreatedAt() {
         return createdAt;
     }
 
-    public Instant getLastUpdatedAt() {
+    public Time getLastUpdatedAt() {
         return lastUpdatedAt;
     }
 
@@ -348,7 +340,7 @@ public class MarkerDataStandardized {
      */
     public void setLatitude(double latitude) {
         this.latitude = latitude;
-        this.lastUpdatedAt = Instant.now();
+        this.lastUpdatedAt = Time.now();
     }
 
     /**
@@ -360,7 +352,7 @@ public class MarkerDataStandardized {
      */
     public void setLongitude(double longitude) {
         this.longitude = longitude;
-        this.lastUpdatedAt = Instant.now();
+        this.lastUpdatedAt = Time.now();
     }
 
     /**
@@ -372,7 +364,7 @@ public class MarkerDataStandardized {
      */
     public void setBearing(float bearing) {
         this.bearing = bearing;
-        this.lastUpdatedAt = Instant.now();
+        this.lastUpdatedAt = Time.now();
     }
 
     /**
@@ -415,7 +407,7 @@ public class MarkerDataStandardized {
      * @param createdAt The timestamp indicating when the marker data was created.
      *                  It is represented as an Instant object and should not be null.
      */
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(Time createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -425,7 +417,7 @@ public class MarkerDataStandardized {
      * @param lastUpdatedAt The timestamp of the last update. It is represented
      *                      as an Instant object and should not be null.
      */
-    public void setLastUpdatedAt(Instant lastUpdatedAt) {
+    public void setLastUpdatedAt(Time lastUpdatedAt) {
         this.lastUpdatedAt = lastUpdatedAt;
     }
 
@@ -550,7 +542,7 @@ public class MarkerDataStandardized {
         this.latitude = newLatitude;
         this.longitude = newLongitude;
         this.bearing = newBearing;
-        this.lastUpdatedAt = Instant.now();
+        this.lastUpdatedAt = Time.now();
     }
 
     @NonNull

@@ -5,15 +5,14 @@ import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
+import fr.ynryo.ouestcefdpdetram.utils.Time;
 
 public class MarkerDataStop {
     private String stopRef; // Identifiant unique de l'arrêt
     private String stopName; // Nom de l'arrêt
     private String platformName; // Quai/Platform (ex: "A3", "Voie 2")
-    private LocalTime arrivalTime; // Heure d'arrivée
-    private LocalTime departureTime; // Heure de départ
+    private Time arrivalTime; // Heure d'arrivée
+    private Time departureTime; // Heure de départ
     private Long delay; // Retard/décalage par rapport à l'horaire prévu
     private StopType stopType; // Type d'arrêt (PICKUP, DROPOFF)
     private double distanceTraveled; // Distance parcouru par le véhicule à cet arrêt
@@ -50,7 +49,7 @@ public class MarkerDataStop {
         this.vehicle = markerDataStop.vehicle;
     }
 
-    public MarkerDataStop(String stopRef, String stopName, LocalTime arrivingTime, LocalTime departureTime) {
+    public MarkerDataStop(String stopRef, String stopName, Time arrivingTime, Time departureTime) {
         this.stopRef = stopRef;
         this.stopName = stopName;
         this.arrivalTime = arrivingTime;
@@ -72,22 +71,17 @@ public class MarkerDataStop {
     }
 
     @Nullable
-    public LocalTime getArrivalTime() {
+    public Time getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(LocalTime arrivalTime) {
+    public void setArrivalTime(Time arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
     @Nullable
     public Long getAtStopTime() {
-        LocalTime arrival = getArrivalTime();
-        LocalTime departure = getDepartureTime();
-
-        if (arrival == null || departure == null) return null;
-
-        return ChronoUnit.MINUTES.between(arrival, departure);
+        return Time.minutesBetween(arrivalTime, departureTime);
     }
 
     public Long getDelay() {
@@ -145,11 +139,11 @@ public class MarkerDataStop {
     }
 
     @Nullable
-    public LocalTime getDepartureTime() {
+    public Time getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(LocalTime departureTime) {
+    public void setDepartureTime(Time departureTime) {
         this.departureTime = departureTime;
     }
 

@@ -38,8 +38,6 @@ import com.google.android.material.color.MaterialColors;
 
 import java.lang.ref.WeakReference;
 import java.net.URI;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,10 +48,10 @@ import fr.ynryo.ouestcefdpdetram.managers.FetchingManager;
 import fr.ynryo.ouestcefdpdetram.managers.um.TimelineRowType;
 import fr.ynryo.ouestcefdpdetram.managers.um.TrainUmAssembler;
 import fr.ynryo.ouestcefdpdetram.managers.um.TrainUmTimelineRow;
+import fr.ynryo.ouestcefdpdetram.utils.Time;
 
 public class MarkerStopsDetailActivity {
     private static final String TAG = "MarkerStopsDetailActivity";
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private static final int COLOR_GREEN = Color.rgb(15, 150, 40);
     private final MainActivity context;
     private BottomSheetDialog bottomSheetDialog;
@@ -320,13 +318,11 @@ public class MarkerStopsDetailActivity {
     }
 
     private static int getTimelineLayout(MarkerDataStop stop, int position, int itemCount) {
-        Log.d(TAG, "isBusAtDeparture" + stop.getVehicle().isVehicle() + " " + stop.getVehicle().getDistanceTraveled() + " " + stop.isDepartureStop());
-        boolean isTrainAtDeparture = stop.getVehicle().isTrain() && position == 0;
-        boolean isBusAtDeparture = stop.getVehicle().isVehicle() && (stop.getVehicle().getDistanceTraveled() == 0) && stop.isDepartureStop();
-        boolean isVehicleAtArrival = stop.isDestinationStop() || position == itemCount - 1;
-        if (isTrainAtDeparture || isBusAtDeparture) {
+        boolean isFirstStop = position == 0 || stop.isDepartureStop();
+        boolean isLastStop = position == itemCount - 1 || stop.isDestinationStop();
+        if (isFirstStop) {
             return R.layout.timeline_first_stop;
-        } else if (isVehicleAtArrival) {
+        } else if (isLastStop) {
             return R.layout.timeline_last_stop;
         } else {
             return R.layout.timeline_intermediate_stop;
@@ -532,15 +528,15 @@ public class MarkerStopsDetailActivity {
 
         private void bindArrivalTime(StopViewHolder vh, MarkerDataStop stop) {
             MarkerDataStandardized vehicle = stop.getVehicle();
-            if (!vehicle.isTrain() || stop.isDepartureStop()) {
+            if (stop.isDepartureStop()) {
                 vh.tvArrivingTime.setVisibility(View.GONE);
                 return;
             }
 
-            LocalTime arrivalTime = stop.getArrivalTime();
-            if (arrivalTime != null) {
+            Time arrivalTime = stop.getArrivalTime() != null ? stop.getArrivalTime() : (stop.isDestinationStop() ? stop.getDepartureTime() : null);
+            if (arrivalTime != null && (vehicle.isTrain() || stop.isDestinationStop())) {
                 vh.tvArrivingTime.setVisibility(View.VISIBLE);
-                vh.tvArrivingTime.setText(arrivalTime.format(TIME_FORMATTER));
+                vh.tvArrivingTime.setText(Time.formatHHmm(arrivalTime));
                 vh.tvArrivingTime.setTextColor(stop.isOnLive() ? COLOR_GREEN : getDefaultTextColor(vh));
                 bindOnLive(vh.ivArrivingTimeIcon, stop);
             } else {
@@ -570,10 +566,10 @@ public class MarkerStopsDetailActivity {
                 return;
             }
 
-            LocalTime departureTime = stop.getDepartureTime();
+            Time departureTime = stop.getDepartureTime();
             if (departureTime != null) {
                 vh.tvDepartureTime.setVisibility(View.VISIBLE);
-                vh.tvDepartureTime.setText(departureTime.format(TIME_FORMATTER));
+                vh.tvDepartureTime.setText(Time.formatHHmm(departureTime));
                 vh.tvDepartureTime.setTextColor(stop.isOnLive() ? COLOR_GREEN : getDefaultTextColor(vh));
                 bindOnLive(vh.ivDepartureTimeIcon, stop);
             } else {
@@ -911,10 +907,10 @@ public class MarkerStopsDetailActivity {
             container.setVisibility(View.VISIBLE);
 
             boolean isDepStop = stop.isDepartureStop();
-            LocalTime arrivalTime = stop.getArrivalTime();
+            Time arrivalTime = stop.getArrivalTime() != null ? stop.getArrivalTime() : (stop.isDestinationStop() ? stop.getDepartureTime() : null);
             if (arrivalTime != null && !isDepStop) {
                 tvArrival.setVisibility(View.VISIBLE);
-                tvArrival.setText(arrivalTime.format(TIME_FORMATTER));
+                tvArrival.setText(Time.formatHHmm(arrivalTime));
                 tvArrival.setTextColor(stop.isOnLive() ? COLOR_GREEN : MaterialColors.getColor(tvDeparture, com.google.android.material.R.attr.colorOnSurface));
                 if (stop.isOnLive()) {
                     ivArrivalIcon.setImageResource(R.drawable.icon_sensors);
@@ -945,10 +941,10 @@ public class MarkerStopsDetailActivity {
                 tvDeparture.setVisibility(View.GONE);
                 ivDepartureIcon.setVisibility(View.GONE);
             } else {
-                LocalTime departureTime = stop.getDepartureTime();
+                Time departureTime = stop.getDepartureTime();
                 if (departureTime != null) {
                     tvDeparture.setVisibility(View.VISIBLE);
-                    tvDeparture.setText(departureTime.format(TIME_FORMATTER));
+                    tvDeparture.setText(Time.formatHHmm(departureTime));
                     tvDeparture.setTextColor(stop.isOnLive() ? COLOR_GREEN : MaterialColors.getColor(tvDeparture, com.google.android.material.R.attr.colorOnSurface));
                     if (stop.isOnLive()) {
                         ivDepartureIcon.setImageResource(R.drawable.icon_sensors);

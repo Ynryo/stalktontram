@@ -8,6 +8,7 @@ import java.util.Set;
 import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.MarkerDataStop;
 import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.MarkerType;
+import fr.ynryo.ouestcefdpdetram.utils.Time;
 
 public class TrainUmAssembler {
     private final static String TAG = "TrainUmAssembler";
@@ -117,8 +118,8 @@ public class TrainUmAssembler {
                 commonStop.setVehicle(um); // Appartient à l'UM global
 
                 // Vérifier si les horaires divergent même s'ils sont dans la phase commune (séparation au départ du quai)
-                java.time.LocalTime depA = stopA.getDepartureTime() != null ? stopA.getDepartureTime() : stopA.getArrivalTime();
-                java.time.LocalTime depB = stopB.getDepartureTime() != null ? stopB.getDepartureTime() : stopB.getArrivalTime();
+                Time depA = stopA.getDepartureTime() != null ? stopA.getDepartureTime() : stopA.getArrivalTime();
+                Time depB = stopB.getDepartureTime() != null ? stopB.getDepartureTime() : stopB.getArrivalTime();
 
                 if (depA != null && depB != null && !depA.equals(depB)) {
                     // Les trains se séparent ici !
