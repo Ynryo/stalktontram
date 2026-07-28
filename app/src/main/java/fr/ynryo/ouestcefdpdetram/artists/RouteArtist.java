@@ -40,43 +40,14 @@ public class RouteArtist {
 
     public void drawVehicleRoute(MarkerDataStandardized mData) {
         if (mData == null) return;
-        if (mData.isTrain()) {
-            PolylineOptions options = new PolylineOptions()
-                    .width(12)
-                    .color(Color.parseColor(mData.getFillColor()))
-                    .geodesic(true)
-                    .zIndex(2.0f);
-
-            boolean pointsAdded = false;
-
-            this.remove();
-            try {
-                List<List<Double>> allPoints;
-                Object geometry = mData.getMarkerDataRoute();
-                if (geometry instanceof List) {
-                    allPoints = (List<List<Double>>) geometry;
-                    for (List<Double> point : allPoints) {
-                        options.add(new LatLng(point.get(1), point.get(0))); // switch lat long
-                        pointsAdded = true;
-                    }
-                }
-            } catch (ClassCastException e) {
-                this.remove();
-                Log.e(TAG, "Format de coordonnées invalide pour LineString");
-            }
-            if (pointsAdded) {
-                currentMarkerId = mData.getId();
-                currentRoutePolyline = context.getMap().addPolyline(options);
-                drawStopCircles(mData);
-            }
-        } else if (mData.isVehicle() || mData.getPathRef() != null) {
+        if (mData.getPathRef() != null) {
             context.getFetcher().fetchBusLine(mData, new FetchingManager.OnRouteLineListener() {
                 @Override
                 public void onResponseRouteLineListener(MarkerDataStandardized mData) {
                     if (mData.getMarkerDataRoute() != null) {
                         PolylineOptions options = new PolylineOptions()
                                 .width(12)
-                                .color(Color.parseColor(mData.getFillColor()))
+                                .color(Color.parseColor(mData.getFillColor() != null ? mData.getFillColor() : "#424242"))
                                 .geodesic(true)
                                 .zIndex(2.0f);
 
