@@ -10,7 +10,7 @@ import fr.ynryo.ouestcefdpdetram.utils.Time;
 public class MarkerDataStop {
     private String stopRef; // Identifiant unique de l'arrêt
     private String stopName; // Nom de l'arrêt
-    private String platformName; // Quai/Platform (ex: "A3", "Voie 2")
+    private StopPlatform platform; // Quai/Platform (ex: "A3", "Voie 2")
     private Time arrivalTime; // Heure d'arrivée
     private Time departureTime; // Heure de départ
     private Long delay; // Retard/décalage par rapport à l'horaire prévu
@@ -34,7 +34,7 @@ public class MarkerDataStop {
     public MarkerDataStop(MarkerDataStop markerDataStop) {
         this.stopRef = markerDataStop.stopRef;
         this.stopName = markerDataStop.stopName;
-        this.platformName = markerDataStop.platformName;
+        this.platform = markerDataStop.platform;
         this.arrivalTime = markerDataStop.arrivalTime;
         this.departureTime = markerDataStop.departureTime;
         this.delay = markerDataStop.delay;
@@ -66,17 +66,13 @@ public class MarkerDataStop {
         return stopName;
     }
 
-    public String getPlatformName() {
-        return platformName;
+    public StopPlatform getPlatform() {
+        return platform;
     }
 
     @Nullable
     public Time getArrivalTime() {
         return arrivalTime;
-    }
-
-    public void setArrivalTime(Time arrivalTime) {
-        this.arrivalTime = arrivalTime;
     }
 
     @Nullable
@@ -134,8 +130,12 @@ public class MarkerDataStop {
         this.stopName = stopName;
     }
 
-    public void setPlatformName(String platformName) {
-        this.platformName = platformName;
+    public void setPlatform(StopPlatform platform) {
+        this.platform = platform;
+    }
+
+    public void setArrivalTime(Time arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Nullable
@@ -204,23 +204,15 @@ public class MarkerDataStop {
     }
 
     public int getDelayColor() {
-        if (delay == null) {
-            return Color.GRAY;
-        }
+        if (delay == null) return Color.GRAY;
 
-        if (delay == 0) {
-            return Color.rgb(15, 150, 40);  // Vert
-        }
+        if (isOnTime()) return Color.rgb(15, 150, 40);  // Vert
 
-        if (delay < 5) {
-            return Color.rgb(224, 159, 7);  // Orange clair
-        }
+        if (delay < 5) return Color.rgb(224, 159, 7);  // Orange clair
 
-        if (delay < 15) {
-            return Color.rgb(224, 112, 7);  // Orange foncé
-        }
+        if (delay < 15) return Color.rgb(224, 135, 7);  // Orange mi foncé
 
-        return Color.RED;
+        return Color.rgb(224, 112, 7);  // Orange foncé
     }
 
     public boolean cantDropoff() {
@@ -249,7 +241,7 @@ public class MarkerDataStop {
         return "MarkerDataStop{" +
                 "stopRef='" + stopRef + '\'' +
                 ", stopName='" + stopName + '\'' +
-                ", platformName='" + platformName + '\'' +
+                ", platformName='" + platform + '\'' +
                 ", arrivalTime='" + arrivalTime + '\'' +
                 ", departureTime='" + departureTime + '\'' +
                 ", delay=" + delay +

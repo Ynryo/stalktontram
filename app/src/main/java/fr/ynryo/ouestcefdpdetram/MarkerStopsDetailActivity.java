@@ -27,6 +27,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +45,7 @@ import java.util.List;
 import fr.ynryo.ouestcefdpdetram.apiResponsesPOJO.network.NetworkData;
 import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.MarkerDataStop;
+import fr.ynryo.ouestcefdpdetram.genericMarkerDatas.StopPlatform;
 import fr.ynryo.ouestcefdpdetram.managers.FetchingManager;
 import fr.ynryo.ouestcefdpdetram.managers.um.TimelineRowType;
 import fr.ynryo.ouestcefdpdetram.managers.um.TrainUmAssembler;
@@ -111,14 +113,9 @@ public class MarkerStopsDetailActivity {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             View nsvContent = view.findViewById(R.id.nsvContent);
             if (nsvContent != null && context != null) {
-                nsvContent.setPadding(
-                        nsvContent.getPaddingLeft(),
-                        nsvContent.getPaddingTop(),
-                        nsvContent.getPaddingRight(),
-                        insets.bottom + context.dpToPx(16)
-                );
-                if (nsvContent instanceof androidx.core.widget.NestedScrollView) {
-                    ((androidx.core.widget.NestedScrollView) nsvContent).setClipToPadding(false);
+                nsvContent.setPadding(nsvContent.getPaddingLeft(), nsvContent.getPaddingTop(), nsvContent.getPaddingRight(), insets.bottom + context.dpToPx(16));
+                if (nsvContent instanceof NestedScrollView) {
+                    ((NestedScrollView) nsvContent).setClipToPadding(false);
                 }
             }
             return windowInsets;
@@ -157,8 +154,9 @@ public class MarkerStopsDetailActivity {
 
     /**
      * Fetch data from API
+     *
      * @param markerDataStandardized the marker data
-     * @param view the view
+     * @param view                   the view
      */
     private void fetchVehicleData(MarkerDataStandardized markerDataStandardized, View view) {
         context.getFetcher().fetchVehicleStopsInfo(markerDataStandardized, new FetchingManager.OnVehicleDetailsListener() {
@@ -184,8 +182,9 @@ public class MarkerStopsDetailActivity {
 
     /**
      * Fetch network logo from API
+     *
      * @param markerDataStandardized the marker data
-     * @param view the view
+     * @param view                   the view
      */
     private void fetchNetworkLogo(MarkerDataStandardized markerDataStandardized, View view) {
         if (markerDataStandardized.getNetworkId() == 0) return;
@@ -205,7 +204,8 @@ public class MarkerStopsDetailActivity {
 
     /**
      * Load network logo from API
-     * @param view the view
+     *
+     * @param view   the view
      * @param imgURI the URI of the logo
      */
     private void loadNetworkLogo(View view, URI imgURI) {
@@ -220,16 +220,12 @@ public class MarkerStopsDetailActivity {
         ivLogo.setAdjustViewBounds(true);
         ivLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        Glide.with(context)
-                .as(PictureDrawable.class)
-                .load(imgURI.toString())
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .override(100, 100)
-                .into(ivLogo);
+        Glide.with(context).as(PictureDrawable.class).load(imgURI.toString()).diskCacheStrategy(DiskCacheStrategy.DATA).override(100, 100).into(ivLogo);
     }
 
     /**
      * Hide loader from view
+     *
      * @param view the view
      */
     private void hideLoader(View view) {
@@ -238,6 +234,7 @@ public class MarkerStopsDetailActivity {
 
     /**
      * Show error from view
+     *
      * @param view the view
      */
     private void showError(View view) {
@@ -249,8 +246,9 @@ public class MarkerStopsDetailActivity {
 
     /**
      * Show vehicle details from marker data
+     *
      * @param markerDataStandardized the marker data
-     * @param view the view
+     * @param view                   the view
      */
     private void showVehicleDetails(MarkerDataStandardized markerDataStandardized, View view) {
         context.getFollowManager().setFollowButton(view.findViewById(R.id.followButton), markerDataStandardized.getId());
@@ -262,7 +260,8 @@ public class MarkerStopsDetailActivity {
 
     /**
      * Setup destination text from marker data
-     * @param view the view
+     *
+     * @param view                   the view
      * @param markerDataStandardized the marker data
      */
     private void setupDestinationText(View view, MarkerDataStandardized markerDataStandardized) {
@@ -340,6 +339,7 @@ public class MarkerStopsDetailActivity {
 
         /**
          * Constructor
+         *
          * @param stops the list of stops
          */
         StopsAdapter(List<MarkerDataStop> stops) {
@@ -348,6 +348,7 @@ public class MarkerStopsDetailActivity {
 
         /**
          * Get item view type
+         *
          * @param position position to query
          * @return the item view type
          */
@@ -358,6 +359,7 @@ public class MarkerStopsDetailActivity {
 
         /**
          * Create a view holder
+         *
          * @param parent   The ViewGroup into which the new View will be added after it is bound to
          *                 an adapter position.
          * @param viewType The view type of the new View.
@@ -374,6 +376,7 @@ public class MarkerStopsDetailActivity {
 
         /**
          * Bind view holder
+         *
          * @param holder   The ViewHolder which should be updated to represent the contents of the
          *                 item at the given position in the data set.
          * @param position The position of the item within the adapter's data set.
@@ -391,6 +394,7 @@ public class MarkerStopsDetailActivity {
 
         /**
          * Get item count
+         *
          * @return the item count
          */
         @Override
@@ -402,33 +406,30 @@ public class MarkerStopsDetailActivity {
 
         /**
          * Create empty view holder
-         * @param parent   The ViewGroup into which the new View will be added after it is bound to
-         *                 an adapter position.
+         *
+         * @param parent The ViewGroup into which the new View will be added after it is bound to
+         *               an adapter position.
          * @return A new ViewHolder that holds a View of the given view type.
          */
         private RecyclerView.ViewHolder createEmptyViewHolder(ViewGroup parent) {
             TextView tvEmpty = new TextView(parent.getContext());
-            tvEmpty.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
+            tvEmpty.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             tvEmpty.setPadding(0, 32, 0, 32);
             tvEmpty.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            return new RecyclerView.ViewHolder(tvEmpty) {};
+            return new RecyclerView.ViewHolder(tvEmpty) {
+            };
         }
 
         /**
          * Bind empty view holder
+         *
          * @param holder The ViewHolder which should be updated to represent the contents of the
          *               item at the given position in the data set.
          */
         private void bindEmptyViewHolder(RecyclerView.ViewHolder holder) {
             TextView tvEmpty = (TextView) holder.itemView;
             tvEmpty.setText(R.string.no_data);
-            tvEmpty.setTextColor(MaterialColors.getColor(
-                    holder.itemView,
-                    com.google.android.material.R.attr.colorOnSurface
-            ));
+            tvEmpty.setTextColor(MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurface));
         }
 
         // ========== STOP ITEM ==========
@@ -463,23 +464,23 @@ public class MarkerStopsDetailActivity {
             if (lineView == null) lineView = timelineView.findViewById(R.id.vLineTop);
             if (lineView == null) lineView = timelineView.findViewById(R.id.vLineFull);
 
-            if (lineView != null) {
+            if (lineView != null)
                 ((GradientDrawable) lineView.getBackground().mutate()).setColor(fillColor);
-            }
 
         }
 
         private void bindPlatform(StopViewHolder vh, MarkerDataStop stop) {
-            String platformName = stop.getPlatformName();
-            if (platformName != null && !platformName.isEmpty()) {
-                vh.tvPlatform.setText(platformName);
+            StopPlatform platform = stop.getPlatform();
+            if (platform != null && platform.getPlatformName() != null) {
+                vh.tvPlatform.setText(platform.getPlatformName());
                 vh.tvPlatform.setVisibility(View.VISIBLE);
                 vh.tvPlatform.setTextColor(Color.WHITE);
                 vh.spacerPlatform.setVisibility(View.VISIBLE);
 
                 GradientDrawable gd = new GradientDrawable();
                 gd.setShape(GradientDrawable.RECTANGLE);
-                gd.setStroke(2, Color.WHITE);
+                boolean dash = platform.getPercentage() == 100;
+                gd.setStroke(2, Color.WHITE, dash ? 8 : 0, dash ? 8 : 0);
                 gd.setCornerRadius(10);
                 vh.tvPlatform.setBackground(gd);
             } else {
@@ -511,18 +512,10 @@ public class MarkerStopsDetailActivity {
             Drawable d = ContextCompat.getDrawable(context, iconRes);
             if (d != null) {
                 d.mutate();
-                d.setColorFilter(new PorterDuffColorFilter(
-                        MaterialColors.getColor(vh.tvStopName, com.google.android.material.R.attr.colorOnSurface),
-                        PorterDuff.Mode.SRC_IN
-                ));
+                d.setColorFilter(new PorterDuffColorFilter(MaterialColors.getColor(vh.tvStopName, com.google.android.material.R.attr.colorOnSurface), PorterDuff.Mode.SRC_IN));
                 int size = (int) (vh.tvStopName.getTextSize() * 1.2f);
                 d.setBounds(0, 0, size, size);
-                builder.setSpan(
-                        new ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
-                        builder.length() - 1,
-                        builder.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                );
+                builder.setSpan(new ImageSpan(d, ImageSpan.ALIGN_BOTTOM), builder.length() - 1, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
 
@@ -782,15 +775,15 @@ public class MarkerStopsDetailActivity {
             bindStopName(vh.tvStopName, stopName, iconRes);
 
             // 3. Determine Platform
-            String platform = "";
+            StopPlatform platform = null;
             if (stopA != null && stopB != null) {
-                String platA = stopA.getPlatformName();
-                String platB = stopB.getPlatformName();
+                StopPlatform platA = stopA.getPlatform();
+                StopPlatform platB = stopB.getPlatform();
                 if (platA != null && platB != null) {
                     if (platA.equals(platB)) {
                         platform = platA;
                     } else {
-                        platform = platA + "/" + platB;
+                        platform = new StopPlatform(platA + "/" + platB);
                     }
                 } else if (platA != null) {
                     platform = platA;
@@ -798,33 +791,21 @@ public class MarkerStopsDetailActivity {
                     platform = platB;
                 }
             } else if (stopA != null) {
-                platform = stopA.getPlatformName();
+                platform = stopA.getPlatform();
             } else if (stopB != null) {
-                platform = stopB.getPlatformName();
+                platform = stopB.getPlatform();
             }
             bindPlatform(vh.tvPlatform, vh.spacerPlatform, platform);
 
             // 4. Bind Columns
             if (row.getType() == TimelineRowType.COMMON) {
-                bindTrainColumn(stopA, (LinearLayout) vh.llTrainAData,
-                        vh.tvArrivingTime, vh.ivArrivingTimeIcon,
-                        vh.tvAtStopTime,
-                        vh.tvDepartureTime, vh.ivDepartureTimeIcon,
-                        vh.tvDelay);
+                bindTrainColumn(stopA, (LinearLayout) vh.llTrainAData, vh.tvArrivingTime, vh.ivArrivingTimeIcon, vh.tvAtStopTime, vh.tvDepartureTime, vh.ivDepartureTimeIcon, vh.tvDelay);
                 vh.llTrainBData.setVisibility(View.GONE);
                 vh.vSplitSeparator.setVisibility(View.GONE);
             } else {
                 // SIDE_BY_SIDE stop
-                bindTrainColumn(stopA, (LinearLayout) vh.llTrainAData,
-                        vh.tvArrivingTime, vh.ivArrivingTimeIcon,
-                        vh.tvAtStopTime,
-                        vh.tvDepartureTime, vh.ivDepartureTimeIcon,
-                        vh.tvDelay);
-                bindTrainColumn(stopB, (LinearLayout) vh.llTrainBData,
-                        vh.tvArrivingTimeB, vh.ivArrivingTimeIconB,
-                        vh.tvAtStopTimeB,
-                        vh.tvDepartureTimeB, vh.ivDepartureTimeIconB,
-                        vh.tvDelayB);
+                bindTrainColumn(stopA, (LinearLayout) vh.llTrainAData, vh.tvArrivingTime, vh.ivArrivingTimeIcon, vh.tvAtStopTime, vh.tvDepartureTime, vh.ivDepartureTimeIcon, vh.tvDelay);
+                bindTrainColumn(stopB, (LinearLayout) vh.llTrainBData, vh.tvArrivingTimeB, vh.ivArrivingTimeIconB, vh.tvAtStopTimeB, vh.tvDepartureTimeB, vh.ivDepartureTimeIconB, vh.tvDelayB);
 
                 boolean showSep = (stopA != null && stopB != null);
                 vh.vSplitSeparator.setVisibility(showSep ? View.VISIBLE : View.GONE);
@@ -892,14 +873,7 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindTrainColumn(
-                MarkerDataStop stop,
-                LinearLayout container,
-                TextView tvArrival, ImageView ivArrivalIcon,
-                TextView tvAtStop,
-                TextView tvDeparture, ImageView ivDepartureIcon,
-                TextView tvDelay
-        ) {
+        private void bindTrainColumn(MarkerDataStop stop, LinearLayout container, TextView tvArrival, ImageView ivArrivalIcon, TextView tvAtStop, TextView tvDeparture, ImageView ivDepartureIcon, TextView tvDelay) {
             if (stop == null) {
                 container.setVisibility(View.GONE);
                 return;
@@ -969,16 +943,16 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindPlatform(TextView tvPlatform, View spacerPlatform, String platformName) {
-            if (platformName != null && !platformName.isEmpty()) {
-                tvPlatform.setText(platformName);
+        private void bindPlatform(TextView tvPlatform, View spacerPlatform, StopPlatform platform) {
+            if (platform != null) {
+                tvPlatform.setText(platform.getPlatformName());
                 tvPlatform.setVisibility(View.VISIBLE);
                 tvPlatform.setTextColor(Color.WHITE);
                 spacerPlatform.setVisibility(View.VISIBLE);
 
                 GradientDrawable gd = new GradientDrawable();
+                gd.setStroke(2, Color.WHITE, 8, 8);
                 gd.setShape(GradientDrawable.RECTANGLE);
-                gd.setStroke(2, Color.WHITE);
                 gd.setCornerRadius(10);
                 tvPlatform.setBackground(gd);
             } else {
@@ -1001,18 +975,10 @@ public class MarkerStopsDetailActivity {
             Drawable d = ContextCompat.getDrawable(context, iconRes);
             if (d != null) {
                 d.mutate();
-                d.setColorFilter(new PorterDuffColorFilter(
-                        MaterialColors.getColor(tvStopName, com.google.android.material.R.attr.colorOnSurface),
-                        PorterDuff.Mode.SRC_IN
-                ));
+                d.setColorFilter(new PorterDuffColorFilter(MaterialColors.getColor(tvStopName, com.google.android.material.R.attr.colorOnSurface), PorterDuff.Mode.SRC_IN));
                 int size = (int) (tvStopName.getTextSize() * 1.2f);
                 d.setBounds(0, 0, size, size);
-                builder.setSpan(
-                        new ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
-                        builder.length() - 1,
-                        builder.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                );
+                builder.setSpan(new ImageSpan(d, ImageSpan.ALIGN_BOTTOM), builder.length() - 1, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
 

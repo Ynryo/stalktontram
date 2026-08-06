@@ -130,9 +130,9 @@ public class MarkerDataStandardized {
                 VehicleStop vehicleStop = vehicleData.getCalls().get(i);
                 MarkerDataStop stop = new MarkerDataStop();
 
-                stop.setStopRef(vehicleStop.getStopRef());
+                stop.setStopRef(vehicleStop.getStopUIC());
                 stop.setStopName(vehicleStop.getStopName());
-                stop.setPlatformName(vehicleStop.getPlatformName());
+                stop.setPlatform(new StopPlatform(vehicleStop.getPlatformName(), vehicleStop.getStopUIC(), 100));
                 Time aimedTime = Time.parse(vehicleStop.getAimedTime());
                 Time expectedTime = Time.parse(vehicleStop.getExpectedTime());
                 boolean onLive = expectedTime != null;

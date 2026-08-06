@@ -25,8 +25,8 @@ public class VehicleStop {
         return expectedTime;
     }
 
-    public String getStopRef() {
-        return stopRef;
+    public String getStopUIC() {
+        return stopRef.contains("SNCF:StopPoint") ? stopRef.split(":")[2] : null;
     }
 
     public String getStopName() {
