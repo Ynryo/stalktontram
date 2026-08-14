@@ -72,6 +72,7 @@ public class RouteArtist {
                             currentMarkerId = mData.getId();
                             currentRoutePolyline = context.getMap().addPolyline(options);
                             drawStopCircles(mData);
+                            updateClearButtonVisibility();
                         }
                     }
                 }
@@ -147,6 +148,20 @@ public class RouteArtist {
         for (Marker m : stopMarkers) m.remove();
         stopMarkers.clear();
         currentMarkerId = null;
+        updateClearButtonVisibility();
+    }
+
+    private void updateClearButtonVisibility() {
+        if (context != null) {
+            View clearBtn = context.findViewById(R.id.fab_clear_route);
+            if (clearBtn != null) {
+                clearBtn.setVisibility(currentRoutePolyline != null ? View.VISIBLE : View.GONE);
+            }
+        }
+    }
+
+    public boolean hasRoute() {
+        return currentRoutePolyline != null;
     }
 
     public boolean isDrew(String markerId) {

@@ -81,4 +81,5 @@
         régulièrement.
     </string>
     <string name="city">Ville</string>
+    <string name="clear_route_desc">Effacer le tracé de la ligne</string>
 </resources>

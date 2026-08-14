@@ -293,6 +293,18 @@ public class MarkerStopsDetailActivity {
         return vehicleId;
     }
 
+    private static int getTimelineLayout(MarkerDataStop stop, int position, int itemCount) {
+        boolean isFirstStop = stop.isDepartureStop();
+        boolean isLastStop = position == itemCount - 1 || stop.isDestinationStop();
+        if (isFirstStop) {
+            return R.layout.timeline_first_stop;
+        } else if (isLastStop) {
+            return R.layout.timeline_last_stop;
+        } else {
+            return R.layout.timeline_intermediate_stop;
+        }
+    }
+
     // ==================== ADAPTER ====================
 
     private static class StopViewHolder extends RecyclerView.ViewHolder {
@@ -313,18 +325,6 @@ public class MarkerStopsDetailActivity {
             ivArrivingTimeIcon = itemView.findViewById(R.id.ivArrivingTimeIcon);
             ivDepartureTimeIcon = itemView.findViewById(R.id.ivDepartureTimeIcon);
             flTimeline = itemView.findViewById(R.id.flTimeline);
-        }
-    }
-
-    private static int getTimelineLayout(MarkerDataStop stop, int position, int itemCount) {
-        boolean isFirstStop = stop.isDepartureStop();
-        boolean isLastStop = position == itemCount - 1 || stop.isDestinationStop();
-        if (isFirstStop) {
-            return R.layout.timeline_first_stop;
-        } else if (isLastStop) {
-            return R.layout.timeline_last_stop;
-        } else {
-            return R.layout.timeline_intermediate_stop;
         }
     }
 
