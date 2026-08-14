@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Où est ce fdp de tram</string>
+    <string name="app_name" translatable="false">Stalk Ton Bus</string>
     <string name="nexts_stops">Prochains arrêts</string>
     <string name="start_time">Heure de départ</string>
     <string name="title_activity_maps" translatable="false">MapsActivity</string>
