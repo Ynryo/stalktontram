@@ -2,6 +2,7 @@ package fr.ynryo.stalktonbus.genericMarkerDatas;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MarkerTrip {
@@ -14,7 +15,7 @@ public class MarkerTrip {
 
     public MarkerTrip() {
         this.destination = "";
-        this.stops = null;
+        this.stops = new ArrayList<>();
         this.atStop = false;
         this.distanceTraveled = 0;
         this.pathRef = "";
