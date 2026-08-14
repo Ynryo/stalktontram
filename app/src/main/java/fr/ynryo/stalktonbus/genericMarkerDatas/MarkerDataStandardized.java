@@ -14,21 +14,13 @@ import fr.ynryo.stalktonbus.utils.Time;
 public class MarkerDataStandardized {
 
     // ==================== DONNÉES D'IDENTIFICATION ====================
-    private MarkerType markerType; // Type du véhicule (train ou bus/tram)
-    private String id; // ID unique (numéro train ou id bus tracker)
-    private int lineId; // Numéro de ligne (vehicleNumber pour train et lineNumber pour le reste)
-    private String lineNumber; // Numéro de ligne pour l'affichage
-    private String networkRef; // Référence réseau (ex: "SNCF", "RATP")
-    private int networkId; // ID numérique du réseau (pour fetch logo)
+    private MarkerIdentity markerIdentity;
 
     // ==================== DONNÉES D'AFFICHAGE ====================
-    private String fillColor; // Couleur de remplissage du marqueur
-    private String textColor; // Couleur du texte (numéro de ligne)
+    private MarkerStyle markerStyle;
 
     // ==================== POSITION ET DIRECTION ====================
-    private double latitude; // Latitude actuelle
-    private double longitude; // Longitude actuelle
-    private float bearing; // Azimut/direction du véhicule (0-360°)
+    private MarkerPosition markerPosition;
     private String pathRef; // Référence du tracé
     private Object markerDataRoute; // Liste des points du tracé
 
@@ -53,6 +45,9 @@ public class MarkerDataStandardized {
 
     // ==================== CONSTRUCTEURS ====================
     public MarkerDataStandardized() {
+        this.markerIdentity = new MarkerIdentity();
+        this.markerPosition = new MarkerPosition();
+        this.markerStyle = new MarkerStyle();
         this.stops = new ArrayList<>();
         this.createdAt = Time.now();
         this.lastUpdatedAt = Time.now();
@@ -73,34 +68,40 @@ public class MarkerDataStandardized {
     public static MarkerDataStandardized createNewMarkerFrom(@NonNull MarkerData markerData, @NonNull MarkerType type) {
         MarkerDataStandardized marker = new MarkerDataStandardized();
 
-        marker.markerType = type;
-        marker.id = markerData.getId();
-        marker.lineId = marker.isTrain() ? Integer.parseInt(markerData.getVehicleNumber()) : 0;
-        marker.lineNumber = marker.isTrain() ? markerData.getVehicleNumber() : markerData.getLineNumber();
-        marker.networkRef = markerData.getNetworkRef();
-        marker.fillColor = markerData.getFillColor();
-        marker.textColor = markerData.getColor();
-        marker.latitude = markerData.getPosition().getLatitude();
-        marker.longitude = markerData.getPosition().getLongitude();
-        marker.bearing = markerData.getPosition().getBearing();
+        boolean isTrain = (type == MarkerType.TRAIN);
+        int lineId = 0;
+        if (isTrain && markerData.getVehicleNumber() != null) {
+            try {
+                lineId = Integer.parseInt(markerData.getVehicleNumber());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        String lineNumber = isTrain ? markerData.getVehicleNumber() : markerData.getLineNumber();
+
+        marker.markerIdentity = new MarkerIdentity(
+                type,
+                markerData.getId(),
+                lineId,
+                lineNumber,
+                markerData.getNetworkRef()
+        );
+        if (markerData.getPosition() != null) {
+            marker.markerPosition = new MarkerPosition(
+                    markerData.getPosition().getLatitude(),
+                    markerData.getPosition().getLongitude(),
+                    markerData.getPosition().getBearing()
+            );
+        } else {
+            marker.markerPosition = new MarkerPosition();
+        }
+        marker.markerStyle = new MarkerStyle(
+                markerData.getColor(),
+                markerData.getFillColor()
+        );
         marker.createdAt = Time.now();
         marker.lastUpdatedAt = Time.now();
         marker.detailsLoaded = false;
 
-        return marker;
-    }
-
-    /**
-     * Creates a standardized marker data instance from the given marker data, vehicle data, and marker type.
-     *
-     * @param markerData   the original marker data to be transformed into a standardized format, must not be null
-     * @param vehicleData  the vehicle data to be associated with the marker, must not be null
-     * @param type         the type of marker to be used for standardization, must not be null
-     * @return a new instance of {@code MarkerDataStandardized} containing the standardized marker data
-     */
-    public static MarkerDataStandardized createNewMarkerFrom(@NonNull MarkerData markerData, @NonNull VehicleData vehicleData, @NonNull MarkerType type) {
-        MarkerDataStandardized marker = createNewMarkerFrom(markerData, type);
-        marker.setVehicleDetailsVehicleData(vehicleData);
         return marker;
     }
 
@@ -117,9 +118,9 @@ public class MarkerDataStandardized {
      *                    flags (e.g., NO_PICKUP, NO_DROPOFF), and other related metadata.
      */
     public void setVehicleDetailsVehicleData(@NonNull VehicleData vehicleData) {
-        this.lineId = vehicleData.getLineId();
+        this.markerIdentity.setLineId(vehicleData.getLineId());
         this.destination = vehicleData.getDestination();
-        this.networkId = vehicleData.getNetworkId();
+        this.markerIdentity.setNetworkId(vehicleData.getNetworkId());
         this.pathRef = vehicleData.getPathRef();
         this.atStop = vehicleData.getPosition().isAtStop();
         this.distanceTraveled = vehicleData.getPosition().getDistanceTraveled();
@@ -166,47 +167,47 @@ public class MarkerDataStandardized {
 
     // ==================== GETTERS ====================
     public MarkerType getMarkerType() {
-        return markerType;
+        return markerIdentity.getMarkerType();
     }
 
     public String getId() {
-        return id;
+        return markerIdentity.getId();
     }
 
     public int getLineId() {
-        return lineId;
+        return markerIdentity.getLineId();
     }
 
     public String getLineNumber() {
-        return lineNumber;
+        return markerIdentity.getLineNumber();
     }
 
     public String getNetworkRef() {
-        return networkRef;
+        return markerIdentity.getNetworkRef();
     }
 
     public int getNetworkId() {
-        return networkId;
+        return markerIdentity.getNetworkId();
     }
 
     public String getFillColor() {
-        return fillColor;
+        return markerStyle.getFillColor();
     }
 
     public String getTextColor() {
-        return textColor;
+        return markerStyle.getTextColor();
     }
 
     public double getLatitude() {
-        return latitude;
+        return markerPosition.getLatitude();
     }
 
     public double getLongitude() {
-        return longitude;
+        return markerPosition.getLongitude();
     }
 
     public float getBearing() {
-        return bearing;
+        return markerPosition.getBearing();
     }
 
     public String getDestination() {
@@ -265,7 +266,7 @@ public class MarkerDataStandardized {
      * @param markerType the MarkerType to be set
      */
     public void setMarkerType(MarkerType markerType) {
-        this.markerType = markerType;
+        this.markerIdentity.setMarkerType(markerType);
     }
 
     /**
@@ -274,7 +275,7 @@ public class MarkerDataStandardized {
      * @param id the identifier to be set
      */
     public void setId(String id) {
-        this.id = id;
+        this.markerIdentity.setId(id);
     }
 
     /**
@@ -283,7 +284,7 @@ public class MarkerDataStandardized {
      * @param lineId the identifier to be assigned to the line
      */
     public void setLineId(int lineId) {
-        this.lineId = lineId;
+        this.markerIdentity.setLineId(lineId);
     }
 
     /**
@@ -292,7 +293,7 @@ public class MarkerDataStandardized {
      * @param lineNumber the line number to be set
      */
     public void setLineNumber(String lineNumber) {
-        this.lineNumber = lineNumber;
+        this.markerIdentity.setLineNumber(lineNumber);
     }
 
     /**
@@ -301,7 +302,7 @@ public class MarkerDataStandardized {
      * @param networkRef The identifier or reference of the network to be set.
      */
     public void setNetworkRef(String networkRef) {
-        this.networkRef = networkRef;
+        this.markerIdentity.setNetworkRef(networkRef);
     }
 
     /**
@@ -310,7 +311,7 @@ public class MarkerDataStandardized {
      * @param networkId the unique identifier of the network to be set
      */
     public void setNetworkId(int networkId) {
-        this.networkId = networkId;
+        this.markerIdentity.setNetworkId(networkId);
     }
 
     /**
@@ -319,7 +320,7 @@ public class MarkerDataStandardized {
      * @param fillColor the color to use for filling, specified as a string
      */
     public void setFillColor(String fillColor) {
-        this.fillColor = fillColor;
+        this.markerStyle.setFillColor(fillColor);
     }
 
     /**
@@ -328,7 +329,7 @@ public class MarkerDataStandardized {
      * @param textColor the color to set for the text, specified as a string
      */
     public void setTextColor(String textColor) {
-        this.textColor = textColor;
+        this.markerStyle.setTextColor(textColor);
     }
 
     /**
@@ -339,7 +340,7 @@ public class MarkerDataStandardized {
      *                 and 90.0.
      */
     public void setLatitude(double latitude) {
-        this.latitude = latitude;
+        this.markerPosition.setLatitude(latitude);
         this.lastUpdatedAt = Time.now();
     }
 
@@ -351,7 +352,7 @@ public class MarkerDataStandardized {
      *                  between -180.0 and 180.0.
      */
     public void setLongitude(double longitude) {
-        this.longitude = longitude;
+        this.markerPosition.setLongitude(longitude);
         this.lastUpdatedAt = Time.now();
     }
 
@@ -363,7 +364,7 @@ public class MarkerDataStandardized {
      *                range from 0.0 to 360.0, where 0.0 points to the north.
      */
     public void setBearing(float bearing) {
-        this.bearing = bearing;
+        this.markerPosition.setBearing(bearing);
         this.lastUpdatedAt = Time.now();
     }
 
@@ -485,7 +486,7 @@ public class MarkerDataStandardized {
      * @return true if the marker type is TRAIN; false otherwise.
      */
     public boolean isTrain() {
-        return markerType == MarkerType.TRAIN;
+        return markerIdentity.getMarkerType() == MarkerType.TRAIN;
     }
 
     /**
@@ -494,7 +495,7 @@ public class MarkerDataStandardized {
      * @return true if the marker type is BUS_TRAM; false otherwise.
      */
     public boolean isVehicle() {
-        return markerType == MarkerType.BUS_TRAM;
+        return markerIdentity.getMarkerType() == MarkerType.BUS_TRAM;
     }
 
     /**
@@ -512,7 +513,7 @@ public class MarkerDataStandardized {
      * Retrieves the next stop in the list of stops, if available.
      *
      * @return the next stop as a {@code MarkerDataStop} object if the stops list is not null or empty;
-     *         otherwise, returns {@code null}.
+     * otherwise, returns {@code null}.
      */
     @Nullable
     public MarkerDataStop getNextStop() {
@@ -539,9 +540,9 @@ public class MarkerDataStandardized {
      * @param newBearing   the updated bearing value in degrees
      */
     public void updatePosition(double newLatitude, double newLongitude, float newBearing) {
-        this.latitude = newLatitude;
-        this.longitude = newLongitude;
-        this.bearing = newBearing;
+        this.markerPosition.setLatitude(newLatitude);
+        this.markerPosition.setLongitude(newLongitude);
+        this.markerPosition.setBearing(newBearing);
         this.lastUpdatedAt = Time.now();
     }
 
@@ -549,20 +550,15 @@ public class MarkerDataStandardized {
     @Override
     public String toString() {
         return "MarkerDataStandardized{" +
-                "markerType=" + markerType +
-                ", id='" + id + '\'' +
-                ", lineId='" + lineId + '\'' +
-                ", lineNumber='" + lineNumber + '\'' +
-                ", networkRef='" + networkRef + '\'' +
-                ", networkId=" + networkId +
-                ", fillColor='" + fillColor + '\'' +
-                ", textColor='" + textColor + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", bearing=" + bearing +
+                "markerIdentity=" + markerIdentity +
+                ", markerStyle=" + markerStyle +
+                ", markerPosition=" + markerPosition +
+                ", pathRef='" + pathRef + '\'' +
                 ", markerDataRoute=" + markerDataRoute +
                 ", destination='" + destination + '\'' +
                 ", stops=" + stops +
+                ", atStop=" + atStop +
+                ", distanceTraveled=" + distanceTraveled +
                 ", isFollowed=" + isFollowed +
                 ", createdAt=" + createdAt +
                 ", lastUpdatedAt=" + lastUpdatedAt +
