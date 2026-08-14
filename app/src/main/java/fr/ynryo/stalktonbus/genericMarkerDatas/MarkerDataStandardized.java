@@ -21,14 +21,9 @@ public class MarkerDataStandardized {
 
     // ==================== POSITION ET DIRECTION ====================
     private MarkerPosition markerPosition;
-    private String pathRef; // Référence du tracé
-    private Object markerDataRoute; // Liste des points du tracé
 
     // ==================== DONNÉES DE VOYAGE ====================
-    private String destination; // Destination finale
-    private List<MarkerDataStop> stops; // Liste des arrêts à venir
-    private boolean atStop;
-    private float distanceTraveled;
+    private MarkerTrip markerTrip;
 
     // ==================== MÉTADONNÉES ====================
     private boolean isFollowed; // Est-ce que l'utilisateur suit ce véhicule?
@@ -48,7 +43,7 @@ public class MarkerDataStandardized {
         this.markerIdentity = new MarkerIdentity();
         this.markerPosition = new MarkerPosition();
         this.markerStyle = new MarkerStyle();
-        this.stops = new ArrayList<>();
+        this.markerTrip = new MarkerTrip();
         this.createdAt = Time.now();
         this.lastUpdatedAt = Time.now();
         this.isFollowed = false;
@@ -119,14 +114,13 @@ public class MarkerDataStandardized {
      */
     public void setVehicleDetailsVehicleData(@NonNull VehicleData vehicleData) {
         this.markerIdentity.setLineId(vehicleData.getLineId());
-        this.destination = vehicleData.getDestination();
+        this.markerTrip.setDestination(vehicleData.getDestination());
         this.markerIdentity.setNetworkId(vehicleData.getNetworkId());
-        this.pathRef = vehicleData.getPathRef();
-        this.atStop = vehicleData.getPosition().isAtStop();
-        this.distanceTraveled = vehicleData.getPosition().getDistanceTraveled();
+        this.markerTrip.setPathRef(vehicleData.getPathRef());
+        this.markerTrip.setAtStop(vehicleData.getPosition().isAtStop());
+        this.markerTrip.setDistanceTraveled(vehicleData.getPosition().getDistanceTraveled());
 
         if (vehicleData.getCalls() != null && !vehicleData.getCalls().isEmpty()) {
-            this.stops = new ArrayList<>();
             for (int i = 0; i < vehicleData.getCalls().size(); i++) { //calls = stops
                 VehicleStop vehicleStop = vehicleData.getCalls().get(i);
                 MarkerDataStop stop = new MarkerDataStop();
@@ -157,7 +151,7 @@ public class MarkerDataStandardized {
                     stop.setStopType(StopType.BOTH);
                 }
 
-                this.stops.add(stop);
+                this.markerTrip.getStops().add(stop);
             }
         }
 
@@ -211,19 +205,19 @@ public class MarkerDataStandardized {
     }
 
     public String getDestination() {
-        return destination;
+        return markerTrip.getDestination();
     }
 
     public List<MarkerDataStop> getStops() {
-        return stops != null ? stops : new ArrayList<>();
+        return markerTrip.getStops() != null ? markerTrip.getStops() : new ArrayList<>();
     }
 
     public boolean isAtStop() {
-        return atStop;
+        return markerTrip.isAtStop();
     }
 
     public float getDistanceTraveled() {
-        return distanceTraveled;
+        return markerTrip.getDistanceTraveled();
     }
 
     public boolean isFollowed() {
@@ -239,11 +233,11 @@ public class MarkerDataStandardized {
     }
 
     public String getPathRef() {
-        return pathRef;
+        return markerTrip.getPathRef();
     }
 
     public Object getMarkerDataRoute() {
-        return markerDataRoute;
+        return markerTrip.getMarkerDataRoute();
     }
 
     public boolean isDetailsLoaded() {
@@ -375,7 +369,7 @@ public class MarkerDataStandardized {
      *                    endpoint or target location associated with the marker.
      */
     public void setDestination(String destination) {
-        this.destination = destination;
+        this.markerTrip.setDestination(destination);
     }
 
     /**
@@ -387,7 +381,7 @@ public class MarkerDataStandardized {
      *              details as not loaded.
      */
     public void setStops(List<MarkerDataStop> stops) {
-        this.stops = stops;
+        this.markerTrip.setStops(stops);
         this.detailsLoaded = (stops != null && !stops.isEmpty());
     }
 
@@ -442,7 +436,7 @@ public class MarkerDataStandardized {
      *                        route or path that the marker is linked to.
      */
     public void setMarkerDataRoute(Object markerDataRoute) {
-        this.markerDataRoute = markerDataRoute;
+        this.markerTrip.setMarkerDataRoute(markerDataRoute);
     }
 
     /**
@@ -517,6 +511,7 @@ public class MarkerDataStandardized {
      */
     @Nullable
     public MarkerDataStop getNextStop() {
+        List<MarkerDataStop> stops = getStops();
         if (stops != null && !stops.isEmpty()) {
             return stops.get(0);
         }
@@ -529,6 +524,7 @@ public class MarkerDataStandardized {
      * @return the count of remaining stops, or 0 if the stops list is null.
      */
     public int getRemainingStopsCount() {
+        List<MarkerDataStop> stops = getStops();
         return stops != null ? stops.size() : 0;
     }
 
@@ -553,12 +549,7 @@ public class MarkerDataStandardized {
                 "markerIdentity=" + markerIdentity +
                 ", markerStyle=" + markerStyle +
                 ", markerPosition=" + markerPosition +
-                ", pathRef='" + pathRef + '\'' +
-                ", markerDataRoute=" + markerDataRoute +
-                ", destination='" + destination + '\'' +
-                ", stops=" + stops +
-                ", atStop=" + atStop +
-                ", distanceTraveled=" + distanceTraveled +
+                ", markerTrip=" + markerTrip +
                 ", isFollowed=" + isFollowed +
                 ", createdAt=" + createdAt +
                 ", lastUpdatedAt=" + lastUpdatedAt +
