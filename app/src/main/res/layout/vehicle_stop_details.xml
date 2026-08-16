@@ -20,21 +20,35 @@
         android:orientation="horizontal"
         android:paddingVertical="8dp">
 
-        <TextView
-            android:id="@+id/tvPlatform"
+        <LinearLayout
+            android:id="@+id/llPlatformContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:textColor="@android:color/black"
-            android:textSize="12sp"
-            android:visibility="gone" />
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_platform"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="3dp"
+            android:visibility="gone">
 
-        <View
-            android:id="@+id/spacerPlatform"
-            android:layout_width="8dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
+            <TextView
+                android:id="@+id/tvPlatformLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/platform_label"
+                android:textColor="@android:color/white"
+                android:textSize="7sp" />
+
+            <TextView
+                android:id="@+id/tvPlatform"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvStopName"

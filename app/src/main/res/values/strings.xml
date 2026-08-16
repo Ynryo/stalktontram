@@ -82,4 +82,5 @@
     </string>
     <string name="city">Ville</string>
     <string name="clear_route_desc">Effacer le tracé de la ligne</string>
+    <string name="platform_label">Voie</string>
 </resources>
