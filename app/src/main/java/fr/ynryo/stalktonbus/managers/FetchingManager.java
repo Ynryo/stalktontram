@@ -12,14 +12,14 @@ import java.util.List;
 
 import fr.ynryo.stalktonbus.ApiService;
 import fr.ynryo.stalktonbus.MainActivity;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerPath;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerVehiclePath;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkersList;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.version.VersionResponse;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleDetails;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.version.YnryoVersionResponse;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerType;
 import fr.ynryo.stalktonbus.managers.um.TrainUmAssembler;
@@ -101,7 +101,7 @@ public class FetchingManager {
     }
 
     public interface OnVersionListener {
-        void onResponseVersionListener(VersionResponse version);
+        void onResponseVersionListener(YnryoVersionResponse version);
 
         void onErrorVersionListener(String error);
     }
@@ -191,10 +191,10 @@ public class FetchingManager {
             String encodedId = URLEncoder.encode(markerDataStandardized.getId(), "UTF-8");
             getService(BASE_URL_BUS_TRACKER).getVehicleDetails(encodedId).enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<VehicleData> call, @NonNull Response<VehicleData> response) {
+                public void onResponse(@NonNull Call<BusTrackerVehicleDetails> call, @NonNull Response<BusTrackerVehicleDetails> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        VehicleData vehicleData = response.body();
-                        markerDataStandardized.setVehicleDetailsVehicleData(vehicleData);
+                        BusTrackerVehicleDetails vehicleData = response.body();
+                        markerDataStandardized.setVehicleDetails(vehicleData);
                         Log.d(TAG, String.valueOf(markerDataStandardized));
                         listener.onResponseVehicleDetailsListener(markerDataStandardized);
                     } else {
@@ -240,7 +240,7 @@ public class FetchingManager {
             Log.d(TAG, encodedPathRef);
             getService(BASE_URL_BUS_TRACKER).getPath(encodedPathRef).enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<BusTrackerPath> call, @NonNull Response<BusTrackerPath> response) {
+                public void onResponse(@NonNull Call<BusTrackerVehiclePath> call, @NonNull Response<BusTrackerVehiclePath> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         markerDataStandardized.setMarkerDataRoute(response.body());
                         listener.onResponseRouteLineListener(markerDataStandardized);
@@ -250,7 +250,7 @@ public class FetchingManager {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<BusTrackerPath> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<BusTrackerVehiclePath> call, @NonNull Throwable t) {
                     listener.onErrorRouteLineListener(t.getMessage());
                 }
             });
@@ -310,7 +310,7 @@ public class FetchingManager {
         try {
             getService(BASE_URL_DL_YNRYO).getLatestVersion().enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<VersionResponse> call, @NonNull Response<VersionResponse> response) {
+                public void onResponse(@NonNull Call<YnryoVersionResponse> call, @NonNull Response<YnryoVersionResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseVersionListener(response.body());
                     } else {
@@ -319,7 +319,7 @@ public class FetchingManager {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<VersionResponse> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<YnryoVersionResponse> call, @NonNull Throwable t) {
                     listener.onErrorVersionListener(t.getMessage());
                 }
             });
@@ -333,7 +333,7 @@ public class FetchingManager {
         try {
             getService(BASE_URL_BUS_TRACKER).getVehicleDetails(vehicleId).enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<VehicleData> call, @NonNull Response<VehicleData> response) {
+                public void onResponse(@NonNull Call<BusTrackerVehicleDetails> call, @NonNull Response<BusTrackerVehicleDetails> response) {
                     listener.onResponseVehicleAliveListener(response.code() == 200);
                 }
 

@@ -2,13 +2,13 @@ package fr.ynryo.stalktonbus;
 
 import java.util.List;
 
-import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerPath;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerVehiclePath;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkersList;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.version.VersionResponse;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleDetails;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.version.YnryoVersionResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -36,7 +36,7 @@ public interface ApiService {
     );
 
     @GET("vehicle-journeys/{vehicleId}")
-    Call<VehicleData> getVehicleDetails(
+    Call<BusTrackerVehicleDetails> getVehicleDetails(
         @Path(value = "vehicleId", encoded = true) String vehicleId
     );
 
@@ -52,12 +52,12 @@ public interface ApiService {
     );
 
     @GET("paths/{pathRef}")
-    Call<BusTrackerPath> getPath(
+    Call<BusTrackerVehiclePath> getPath(
         @Path(value = "pathRef", encoded = true) String pathRef
     );
 
     @GET("version/latest")
-    Call<VersionResponse> getLatestVersion();
+    Call<YnryoVersionResponse> getLatestVersion();
 
     @GET("guess_my_platform.php")
     Call<List<CartoTchooGuessPlatform>> getGuestPlatform(

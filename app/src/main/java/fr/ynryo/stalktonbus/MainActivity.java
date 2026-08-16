@@ -30,7 +30,7 @@ import java.util.List;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.version.VersionResponse;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.version.YnryoVersionResponse;
 import fr.ynryo.stalktonbus.artists.MarkerArtist;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.stalktonbus.managers.CompassManager;
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         fetcher.fetchLatestVersion(new FetchingManager.OnVersionListener() {
             @Override
-            public void onResponseVersionListener(VersionResponse version) {
+            public void onResponseVersionListener(YnryoVersionResponse version) {
                 try {
                     PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                     int latestVersionCode = version.getVersion().getVersionCode();

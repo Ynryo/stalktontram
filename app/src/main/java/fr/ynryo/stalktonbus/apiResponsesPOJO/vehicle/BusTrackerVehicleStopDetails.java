@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-public class VehicleStop {
+public class BusTrackerVehicleStopDetails {
     private String aimedTime;
     private String expectedTime;
     private String stopRef;
@@ -64,7 +64,7 @@ public class VehicleStop {
     @NonNull
     @Override
     public String toString() {
-        return "VehicleStop{" +
+        return "BusTrackerVehicleStopDetails{" +
                 "aimedTime='" + aimedTime + '\'' +
                 ", expectedTime='" + expectedTime + '\'' +
                 ", stopRef='" + stopRef + '\'' +

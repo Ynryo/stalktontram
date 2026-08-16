@@ -9,12 +9,12 @@ import java.util.List;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerPosition;
 
 //bus tracker api response
-public class VehicleData {
+public class BusTrackerVehicleDetails {
     private String id;
     private int lineId;
     private String direction;
     private String destination;
-    private List<VehicleStop> calls;
+    private List<BusTrackerVehicleStopDetails> calls;
     private BusTrackerMarkerPosition position;
     private int networkId;
     private String serviceDate;
@@ -38,7 +38,7 @@ public class VehicleData {
         return destination;
     }
 
-    public List<VehicleStop> getCalls() {
+    public List<BusTrackerVehicleStopDetails> getCalls() {
         return calls;
     }
 

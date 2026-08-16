@@ -2,22 +2,22 @@ package fr.ynryo.stalktonbus.apiResponsesPOJO.version;
 
 import androidx.annotation.NonNull;
 
-public class VersionResponse {
+public class YnryoVersionResponse {
     private boolean success;
-    private VersionData version;
+    private YnryoVersionData version;
 
     public boolean isSuccess() {
         return success;
     }
 
-    public VersionData getVersion() {
+    public YnryoVersionData getVersion() {
         return version;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return "VersionResponse{" +
+        return "YnryoVersionResponse{" +
                 "success=" + success +
                 ", version=" + version +
                 '}';

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleStop;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleDetails;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleStopDetails;
 import fr.ynryo.stalktonbus.utils.Time;
 
 public class MarkerDataStandardized {
@@ -102,50 +102,54 @@ public class MarkerDataStandardized {
 
     // à la priorité sur les datas (bus tracker api)
     /**
-     * Updates the details of the current vehicle instance using the given {@code VehicleData} object.
+     * Updates the details of the current vehicle instance using the given {@code BusTrackerVehicleDetails} object.
      * Populates various fields such as line ID, destination, network ID, path reference, stops,
      * and additional attributes related to the vehicle's journey and live data.
      *
-     * @param vehicleData A non-null {@link VehicleData} object containing details such as line ID,
+     * @param busTrackerVehicleDetails A non-null {@link BusTrackerVehicleDetails} object containing details such as line ID,
      *                    destination, network ID, path reference, and a list of vehicle stops.
      *                    Each stop may contain information about stop reference, stop name, platform name,
      *                    expected and aimed times, stop order, coordinates, distance traveled,
      *                    flags (e.g., NO_PICKUP, NO_DROPOFF), and other related metadata.
      */
-    public void setVehicleDetailsVehicleData(@NonNull VehicleData vehicleData) {
-        this.markerIdentity.setLineId(vehicleData.getLineId());
-        this.markerTrip.setDestination(vehicleData.getDestination());
-        this.markerIdentity.setNetworkId(vehicleData.getNetworkId());
-        this.markerTrip.setPathRef(vehicleData.getPathRef());
-        this.markerTrip.setAtStop(vehicleData.getPosition().isAtStop());
-        this.markerTrip.setDistanceTraveled(vehicleData.getPosition().getDistanceTraveled());
+    public void setVehicleDetails(@NonNull BusTrackerVehicleDetails busTrackerVehicleDetails) {
+        this.markerIdentity.setLineId(busTrackerVehicleDetails.getLineId());
+        this.markerTrip.setDestination(busTrackerVehicleDetails.getDestination());
+        this.markerIdentity.setNetworkId(busTrackerVehicleDetails.getNetworkId());
+        this.markerTrip.setPathRef(busTrackerVehicleDetails.getPathRef());
+        this.markerTrip.setAtStop(busTrackerVehicleDetails.getPosition().isAtStop());
+        this.markerTrip.setDistanceTraveled(busTrackerVehicleDetails.getPosition().getDistanceTraveled());
 
-        if (vehicleData.getCalls() != null && !vehicleData.getCalls().isEmpty()) {
-            for (int i = 0; i < vehicleData.getCalls().size(); i++) { //calls = stops
-                VehicleStop vehicleStop = vehicleData.getCalls().get(i);
+        if (!busTrackerVehicleDetails.getCalls().isEmpty()) {
+            for (int i = 0; i < busTrackerVehicleDetails.getCalls().size(); i++) { //calls = stops
+                BusTrackerVehicleStopDetails busTrackerVehicleStopDetails = busTrackerVehicleDetails.getCalls().get(i);
                 MarkerDataStop stop = new MarkerDataStop();
 
-                stop.setStopRef(vehicleStop.getStopUIC());
-                stop.setStopName(vehicleStop.getStopName());
-                stop.setPlatform(new StopPlatform(vehicleStop.getPlatformName(), vehicleStop.getStopUIC(), 100));
-                Time aimedTime = Time.parse(vehicleStop.getAimedTime());
-                Time expectedTime = Time.parse(vehicleStop.getExpectedTime());
+                stop.setStopRef(busTrackerVehicleStopDetails.getStopUIC());
+                stop.setStopName(busTrackerVehicleStopDetails.getStopName());
+                if (busTrackerVehicleStopDetails.getPlatformName() != null) {
+                    stop.setPlatform(
+                            new StopPlatform(busTrackerVehicleStopDetails.getPlatformName(), busTrackerVehicleStopDetails.getStopUIC(), 100)
+                    );
+                }
+                Time aimedTime = Time.parse(busTrackerVehicleStopDetails.getAimedTime());
+                Time expectedTime = Time.parse(busTrackerVehicleStopDetails.getExpectedTime());
                 boolean onLive = expectedTime != null;
 
                 stop.setOnLive(onLive);
                 stop.setDelay(Time.calculateDelayMinutes(aimedTime, expectedTime));
                 stop.setDepartureTime(onLive ? expectedTime : aimedTime);
-                stop.setStopOrder(vehicleStop.getStopOrder());
-                stop.setLongitude(vehicleStop.getLongitude());
-                stop.setLatitude(vehicleStop.getLatitude());
-                stop.setDistanceTraveled(vehicleStop.getDistanceTraveled());
-                stop.setIsDepartureStop(vehicleStop.getDistanceTraveled() == 0);
-                stop.setIsDestinationStop(i == vehicleData.getCalls().size() - 1);
+                stop.setStopOrder(busTrackerVehicleStopDetails.getStopOrder());
+                stop.setLongitude(busTrackerVehicleStopDetails.getLongitude());
+                stop.setLatitude(busTrackerVehicleStopDetails.getLatitude());
+                stop.setDistanceTraveled(busTrackerVehicleStopDetails.getDistanceTraveled());
+                stop.setIsDepartureStop(busTrackerVehicleStopDetails.getDistanceTraveled() == 0);
+                stop.setIsDestinationStop(i == busTrackerVehicleDetails.getCalls().size() - 1);
                 stop.setVehicle(this);
 
-                if (vehicleStop.getFlags().contains("NO_PICKUP")) {
+                if (busTrackerVehicleStopDetails.getFlags().contains("NO_PICKUP")) {
                     stop.setStopType(StopType.NO_PICKUP);
-                } else if (vehicleStop.getFlags().contains("NO_DROPOFF")) {
+                } else if (busTrackerVehicleStopDetails.getFlags().contains("NO_DROPOFF")) {
                     stop.setStopType(StopType.NO_DROPOFF);
                 } else {
                     stop.setStopType(StopType.BOTH);

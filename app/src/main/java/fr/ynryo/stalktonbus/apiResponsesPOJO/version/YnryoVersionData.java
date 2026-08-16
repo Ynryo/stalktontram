@@ -2,7 +2,7 @@ package fr.ynryo.stalktonbus.apiResponsesPOJO.version;
 
 import androidx.annotation.NonNull;
 
-public class VersionData {
+public class YnryoVersionData {
     private String fileName;
     private String version;
     private int versionCode;
@@ -32,7 +32,7 @@ public class VersionData {
     @NonNull
     @Override
     public String toString() {
-        return "VersionData{" +
+        return "YnryoVersionData{" +
                 "fileName='" + fileName + '\'' +
                 ", version='" + version + '\'' +
                 ", versionCode=" + versionCode +
