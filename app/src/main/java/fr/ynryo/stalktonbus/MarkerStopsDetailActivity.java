@@ -305,7 +305,7 @@ public class MarkerStopsDetailActivity {
 
     private static class StopViewHolder extends RecyclerView.ViewHolder {
         final View llPlatformContainer;
-        final TextView tvPlatform, tvStopName, tvDepartureTime, tvAtStopTime, tvArrivingTime, tvDelay;
+        final TextView tvPlatform, tvPlatformLabel, tvStopName, tvDepartureTime, tvAtStopTime, tvArrivingTime, tvDelay;
         final ImageView ivArrivingTimeIcon, ivDepartureTimeIcon;
         final FrameLayout flTimeline;
 
@@ -313,6 +313,7 @@ public class MarkerStopsDetailActivity {
             super(itemView);
             llPlatformContainer = itemView.findViewById(R.id.llPlatformContainer);
             tvPlatform = itemView.findViewById(R.id.tvPlatform);
+            tvPlatformLabel = itemView.findViewById(R.id.tvPlatformLabel);
             tvStopName = itemView.findViewById(R.id.tvStopName);
             tvDepartureTime = itemView.findViewById(R.id.tvDepartureTime);
             tvAtStopTime = itemView.findViewById(R.id.tvAtStopTime);
@@ -459,10 +460,8 @@ public class MarkerStopsDetailActivity {
             View lineView = timelineView.findViewById(R.id.vLineBottom);
             if (lineView == null) lineView = timelineView.findViewById(R.id.vLineTop);
             if (lineView == null) lineView = timelineView.findViewById(R.id.vLineFull);
-
             if (lineView != null)
                 ((GradientDrawable) lineView.getBackground().mutate()).setColor(fillColor);
-
         }
 
         private void bindPlatform(StopViewHolder vh, MarkerDataStop stop) {
@@ -475,7 +474,7 @@ public class MarkerStopsDetailActivity {
                 boolean isPlatformGuessed = platform.getPercentage() != 100;
                 if (isPlatformGuessed) {
                     vh.tvPlatform.setTextColor(Color.GRAY);
-                    //TODO: changer la color de "voie" en gray via tvPlatformLabel
+                    vh.tvPlatformLabel.setTextColor(Color.GRAY);
                     gd.setStroke(2, Color.GRAY, 8, 8);
                 }
             } else {
