@@ -4,8 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleDetails;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleStopDetails;
@@ -156,6 +159,29 @@ public class MarkerDataStandardized {
                 }
 
                 this.markerTrip.getStops().add(stop);
+            }
+        }
+
+        this.detailsLoaded = true;
+        this.lastUpdatedAt = Time.now();
+    }
+
+    public void setGuessStopPlatform(@NonNull String uicCode, @NonNull List<CartoTchooGuessPlatform> guessPlatforms) {
+        if (guessPlatforms.isEmpty()) return;
+
+        // CartoTchooGuessPlatform bestGuessPlatform = guessPlatforms.get(0);
+        CartoTchooGuessPlatform bestGuessPlatform = Collections.max(guessPlatforms, Comparator.comparingDouble(CartoTchooGuessPlatform::getPercentage));
+        for (MarkerDataStop markerDataStop : this.markerTrip.getStops()) {
+            if (uicCode.equals(markerDataStop.getStopRef())) {
+                // secu pour éviter d'écraser un quai officiel à 100% par un guess platform
+                if (markerDataStop.getPlatform() != null && markerDataStop.getPlatform().getPercentage() == 100) {
+                    break;
+                }
+                markerDataStop.setPlatform(new StopPlatform(
+                        bestGuessPlatform.getPlatform(),
+                        uicCode,
+                        bestGuessPlatform.getPercentage()));
+                break;
             }
         }
 

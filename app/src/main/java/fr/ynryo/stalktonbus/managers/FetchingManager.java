@@ -203,7 +203,7 @@ public class FetchingManager {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<VehicleData> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<BusTrackerVehicleDetails> call, @NonNull Throwable t) {
                     listener.onErrorVehicleDetailsListener(t.getMessage());
                 }
             });
@@ -338,7 +338,7 @@ public class FetchingManager {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<VehicleData> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<BusTrackerVehicleDetails> call, @NonNull Throwable t) {
                     listener.onErrorVehicleAliveListener(t.getMessage());
                 }
             });
@@ -373,7 +373,11 @@ public class FetchingManager {
             getService(BASE_URL_API_TCHOO).getGuestPlatform(uicCode, trainNum).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<List<CartoTchooGuessPlatform>> call, @NonNull Response<List<CartoTchooGuessPlatform>> response) {
-                    listener.onResponseGuessPlatformListener(response.body());
+                    if (response.isSuccessful() && response.body() != null) {
+                        listener.onResponseGuessPlatformListener(response.body());
+                    } else {
+                        listener.onErrorGuessPlatformListener("Erreur réponse: " + response.code());
+                    }
                 }
 
                 @Override

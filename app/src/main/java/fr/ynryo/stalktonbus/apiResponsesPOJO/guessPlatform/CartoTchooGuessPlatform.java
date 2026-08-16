@@ -1,5 +1,7 @@
 package fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform;
 
+import androidx.annotation.NonNull;
+
 public class CartoTchooGuessPlatform {
     private String platform;
     private int count;
@@ -15,5 +17,15 @@ public class CartoTchooGuessPlatform {
 
     public float getPercentage() {
         return percentage;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "CartoTchooGuessPlatform{" +
+                "platform='" + platform + '\'' +
+                ", count=" + count +
+                ", percentage=" + percentage +
+                '}';
     }
 }

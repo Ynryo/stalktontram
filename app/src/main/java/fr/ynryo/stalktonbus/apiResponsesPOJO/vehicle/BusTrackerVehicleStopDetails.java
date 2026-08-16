@@ -26,7 +26,7 @@ public class BusTrackerVehicleStopDetails {
     }
 
     public String getStopUIC() {
-        return stopRef.contains("SNCF:StopPoint") ? stopRef.split(":")[2].substring(0, 7) : null;
+        return stopRef.contains("StopPoint") ? stopRef.split(":")[2].substring(0, 7) : null;
     }
 
     public String getStopName() {

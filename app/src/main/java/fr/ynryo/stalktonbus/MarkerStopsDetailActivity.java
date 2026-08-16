@@ -41,6 +41,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStop;
@@ -251,7 +252,8 @@ public class MarkerStopsDetailActivity {
         context.getFavoriteManager().setFavoriteButton(view.findViewById(R.id.favoriteButton), markerDataStandardized);
 
         setupDestinationText(view, markerDataStandardized);
-        setupStopsList(view, markerDataStandardized);
+        StopsAdapter adapter = setupStopsList(view, markerDataStandardized);
+        fetchGuessPlatforms(markerDataStandardized, adapter);
     }
 
     /**
@@ -270,7 +272,7 @@ public class MarkerStopsDetailActivity {
         tvDestination.setSelected(true);
     }
 
-    private void setupStopsList(View view, MarkerDataStandardized markerDataStandardized) {
+    private StopsAdapter setupStopsList(View view, MarkerDataStandardized markerDataStandardized) {
         RecyclerView rvStops = view.findViewById(R.id.rvStops);
         rvStops.setLayoutManager(new LinearLayoutManager(context));
 
@@ -279,10 +281,52 @@ public class MarkerStopsDetailActivity {
 //            rvStops.setAdapter(new UmStopsAdapter(markerDataStandardized, rows));
 //        } else {
             List<MarkerDataStop> stops = markerDataStandardized.getStops() != null ? markerDataStandardized.getStops() : new ArrayList<>();
-            rvStops.setAdapter(new StopsAdapter(stops));
+        StopsAdapter adapter = new StopsAdapter(stops);
+        rvStops.setAdapter(adapter);
 //        }
 
         view.findViewById(R.id.llStopsContent).setVisibility(View.VISIBLE);
+        return adapter;
+    }
+
+    private void fetchGuessPlatforms(MarkerDataStandardized markerDataStandardized, StopsAdapter adapter) {
+        if (!markerDataStandardized.isTrain()) return;
+
+        String rawTrainNum = markerDataStandardized.getLineNumber();
+        if (rawTrainNum == null || rawTrainNum.isEmpty()) return;
+        final String trainNum = rawTrainNum.replaceAll("[^0-9]", "");
+        if (trainNum.isEmpty()) return;
+
+        List<MarkerDataStop> stops = markerDataStandardized.getStops();
+        for (int i = 0; i < stops.size(); i++) {
+            MarkerDataStop stop = stops.get(i);
+            // Si l'arrêt a déjà un quai officiel renseigné (100%), on ne fait pas de requête CartoTchoo
+            if (stop.getPlatform() != null && stop.getPlatform().getPlatformName() != null && !stop.getPlatform().getPlatformName().isEmpty()) {
+                continue;
+            }
+            final int position = i;
+            final String uic = stop.getStopRef();
+            if (uic == null || uic.isEmpty()) continue;
+
+            Log.d(TAG, "Fetching guess platform: uic=" + uic + ", trainNum=" + trainNum);
+            context.getFetcher().fetchGuestPlatform(uic, trainNum, new FetchingManager.OnGuessPlatformListener() {
+                @Override
+                public void onResponseGuessPlatformListener(List<CartoTchooGuessPlatform> cartoTchooGuessPlatform) {
+                    Log.d(TAG, "Réponse guess platform pour UIC " + uic + ": " + cartoTchooGuessPlatform);
+                    if (cartoTchooGuessPlatform != null && !cartoTchooGuessPlatform.isEmpty()) {
+                        markerDataStandardized.setGuessStopPlatform(uic, cartoTchooGuessPlatform);
+                        if (adapter != null) {
+                            adapter.notifyItemChanged(position);
+                        }
+                    }
+                }
+
+                @Override
+                public void onErrorGuessPlatformListener(String error) {
+                    Log.d(TAG, "Pas d'estimation de quai pour UIC " + uic + " : " + error);
+                }
+            });
+        }
     }
 
     public String getCurrentVehicleId() {
