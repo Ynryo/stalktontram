@@ -13,6 +13,7 @@ import java.util.List;
 import fr.ynryo.stalktonbus.ApiService;
 import fr.ynryo.stalktonbus.MainActivity;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerPath;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkersList;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
@@ -37,10 +38,12 @@ public class FetchingManager {
     private static final String TAG = "FetchingManager";
     private static final String BASE_URL_BUS_TRACKER = "https://bus-tracker.fr/api/";
     private static final String BASE_URL_DL_YNRYO = "https://dl.ynryo.fr/api/ouestcefdpdetram/";
+    private static final String BASE_URL_API_TCHOO = "https://api.tchoo.net/api/";
 
     private final MainActivity context;
     private static ApiService busTrackerService;
     private static ApiService dlYnryoService;
+    private static ApiService apiTchooService;
 
     public FetchingManager(MainActivity context) {
         this.context = context;
@@ -52,6 +55,11 @@ public class FetchingManager {
         if (dlYnryoService == null) {
             Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL_DL_YNRYO).addConverterFactory(GsonConverterFactory.create()).build();
             dlYnryoService = retrofit.create(ApiService.class);
+        }
+
+        if (apiTchooService == null) {
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL_API_TCHOO).addConverterFactory(GsonConverterFactory.create()).build();
+            apiTchooService = retrofit.create(ApiService.class);
         }
     }
 
@@ -104,6 +112,12 @@ public class FetchingManager {
         void onErrorVehicleAliveListener(String error);
     }
 
+    public interface OnGuessPlatformListener {
+        void onResponseGuessPlatformListener(List<CartoTchooGuessPlatform> cartoTchooGuessPlatform);
+
+        void onErrorGuessPlatformListener(String error);
+    }
+
     private ApiService getService(String baseUrl) {
         switch (baseUrl) {
             case BASE_URL_BUS_TRACKER:
@@ -111,6 +125,9 @@ public class FetchingManager {
 
             case BASE_URL_DL_YNRYO:
                 return dlYnryoService;
+
+            case BASE_URL_API_TCHOO:
+                return apiTchooService;
 
             default:
                 return null;
@@ -348,5 +365,24 @@ public class FetchingManager {
         }
 
         return result;
+    }
+
+    // ==================== FETCH GUEST PLATFORM ====================
+    public void fetchGuestPlatform(String uicCode, String trainNum, OnGuessPlatformListener listener) {
+        try {
+            getService(BASE_URL_API_TCHOO).getGuestPlatform(uicCode, trainNum).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<List<CartoTchooGuessPlatform>> call, @NonNull Response<List<CartoTchooGuessPlatform>> response) {
+                    listener.onResponseGuessPlatformListener(response.body());
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<List<CartoTchooGuessPlatform>> call, @NonNull Throwable t) {
+                    listener.onErrorGuessPlatformListener(t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            listener.onErrorGuessPlatformListener(e.getMessage());
+        }
     }
 }

@@ -3,6 +3,7 @@ package fr.ynryo.stalktonbus;
 import java.util.List;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerPath;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkersList;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
@@ -57,4 +58,10 @@ public interface ApiService {
 
     @GET("version/latest")
     Call<VersionResponse> getLatestVersion();
+
+    @GET("guess_my_platform.php")
+    Call<List<CartoTchooGuessPlatform>> getGuestPlatform(
+            @Query(value = "uic", encoded = true) String uicCode,
+            @Query(value = "num", encoded = true) String trainNum
+    );
 }

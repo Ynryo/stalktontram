@@ -26,7 +26,7 @@ public class VehicleStop {
     }
 
     public String getStopUIC() {
-        return stopRef.contains("SNCF:StopPoint") ? stopRef.split(":")[2] : null;
+        return stopRef.contains("SNCF:StopPoint") ? stopRef.split(":")[2].substring(0, 7) : null;
     }
 
     public String getStopName() {
