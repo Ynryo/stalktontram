@@ -12,11 +12,11 @@ import java.util.List;
 
 import fr.ynryo.stalktonbus.ApiService;
 import fr.ynryo.stalktonbus.MainActivity;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusGeometry;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.MarkerData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.MarkersList;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.network.NetworkData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.region.RegionData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerPath;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkersList;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.version.VersionResponse;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
@@ -69,7 +69,7 @@ public class FetchingManager {
     }
 
     public interface OnNetworkDataListener {
-        void onResponseNetworkDataListener(NetworkData data);
+        void onResponseNetworkDataListener(BusTrackerNetworkData data);
 
         void onErrorNetworkDataListener(String error);
     }
@@ -81,13 +81,13 @@ public class FetchingManager {
     }
 
     public interface OnNetworkListener {
-        void onResponseNetworkListener(List<NetworkData> data);
+        void onResponseNetworkListener(List<BusTrackerNetworkData> data);
 
         void onErrorNetworkListener(String error);
     }
 
     public interface OnRegionsListener {
-        void onResponseRegionsListener(List<RegionData> regions);
+        void onResponseRegionsListener(List<BusTrackerRegionData> regions);
 
         void onErrorRegionsListener(String error);
     }
@@ -128,9 +128,9 @@ public class FetchingManager {
         LatLngBounds bounds = context.getMap().getProjection().getVisibleRegion().latLngBounds;
         getService(BASE_URL_BUS_TRACKER).getVehicleMarkers(bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude, lineId).enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<MarkersList> call, @NonNull Response<MarkersList> response) {
+            public void onResponse(@NonNull Call<BusTrackerMarkersList> call, @NonNull Response<BusTrackerMarkersList> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Convertir MarkerData en MarkerDataStandardized
+                    // Convertir BusTrackerMarkerData en MarkerDataStandardized
                     List<MarkerDataStandardized> standardizedMarkers = convertMarkerDataList(response.body().getItems());
                     listener.onResponseMarkersListener(standardizedMarkers);
                 } else {
@@ -139,7 +139,7 @@ public class FetchingManager {
             }
 
             @Override
-            public void onFailure(@NonNull Call<MarkersList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<BusTrackerMarkersList> call, @NonNull Throwable t) {
                 listener.onErrorMarkersListener(t.getMessage());
             }
         });
@@ -200,7 +200,7 @@ public class FetchingManager {
     public void fetchNetworkData(int networkId, OnNetworkDataListener listener) {
         getService(BASE_URL_BUS_TRACKER).getNetworkData(networkId).enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<NetworkData> call, @NonNull Response<NetworkData> response) {
+            public void onResponse(@NonNull Call<BusTrackerNetworkData> call, @NonNull Response<BusTrackerNetworkData> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     listener.onResponseNetworkDataListener(response.body());
                 } else {
@@ -209,7 +209,7 @@ public class FetchingManager {
             }
 
             @Override
-            public void onFailure(@NonNull Call<NetworkData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<BusTrackerNetworkData> call, @NonNull Throwable t) {
                 listener.onErrorNetworkDataListener(t.getMessage());
             }
         });
@@ -221,9 +221,9 @@ public class FetchingManager {
             Log.d(TAG, markerDataStandardized.getPathRef());
             String encodedPathRef = URLEncoder.encode(markerDataStandardized.getPathRef(), "UTF-8");
             Log.d(TAG, encodedPathRef);
-            getService(BASE_URL_BUS_TRACKER).getBusLine(encodedPathRef).enqueue(new Callback<>() {
+            getService(BASE_URL_BUS_TRACKER).getPath(encodedPathRef).enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<BusGeometry> call, @NonNull Response<BusGeometry> response) {
+                public void onResponse(@NonNull Call<BusTrackerPath> call, @NonNull Response<BusTrackerPath> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         markerDataStandardized.setMarkerDataRoute(response.body());
                         listener.onResponseRouteLineListener(markerDataStandardized);
@@ -233,7 +233,7 @@ public class FetchingManager {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<BusGeometry> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<BusTrackerPath> call, @NonNull Throwable t) {
                     listener.onErrorRouteLineListener(t.getMessage());
                 }
             });
@@ -247,7 +247,7 @@ public class FetchingManager {
         try {
             getService(BASE_URL_BUS_TRACKER).getNetworks().enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<List<NetworkData>> call, @NonNull Response<List<NetworkData>> response) {
+                public void onResponse(@NonNull Call<List<BusTrackerNetworkData>> call, @NonNull Response<List<BusTrackerNetworkData>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseNetworkListener(response.body());
                     } else {
@@ -256,7 +256,7 @@ public class FetchingManager {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<List<NetworkData>> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<List<BusTrackerNetworkData>> call, @NonNull Throwable t) {
                     listener.onErrorNetworkListener(t.getMessage());
                 }
             });
@@ -270,7 +270,7 @@ public class FetchingManager {
         try {
             getService(BASE_URL_BUS_TRACKER).getRegions().enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<List<RegionData>> call, @NonNull Response<List<RegionData>> response) {
+                public void onResponse(@NonNull Call<List<BusTrackerRegionData>> call, @NonNull Response<List<BusTrackerRegionData>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseRegionsListener(response.body());
                     } else {
@@ -279,7 +279,7 @@ public class FetchingManager {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<List<RegionData>> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<List<BusTrackerRegionData>> call, @NonNull Throwable t) {
                     listener.onErrorRegionsListener(t.getMessage());
                 }
             });
@@ -331,19 +331,19 @@ public class FetchingManager {
     }
 
     // ==================== CONVERSION ====================
-    private List<MarkerDataStandardized> convertMarkerDataList(List<MarkerData> markerDataList) {
+    private List<MarkerDataStandardized> convertMarkerDataList(List<BusTrackerMarkerData> busTrackerMarkerDataList) {
         List<MarkerDataStandardized> result = new ArrayList<>();
 
-        if (markerDataList == null || markerDataList.isEmpty()) return result;
+        if (busTrackerMarkerDataList == null || busTrackerMarkerDataList.isEmpty()) return result;
 
-        for (MarkerData markerData : markerDataList) {
+        for (BusTrackerMarkerData busTrackerMarkerData : busTrackerMarkerDataList) {
             try {
-                MarkerType type = MarkerType.guestFromMarkerId(markerData.getId()); //determiner type
-                MarkerDataStandardized standardized = MarkerDataStandardized.createNewMarkerFrom(markerData, type); //on convert
+                MarkerType type = MarkerType.guestFromMarkerId(busTrackerMarkerData.getId()); //determiner type
+                MarkerDataStandardized standardized = MarkerDataStandardized.createNewMarkerFrom(busTrackerMarkerData, type); //on convert
 
                 result.add(standardized);
             } catch (Exception e) {
-                Log.e("FetchingManager", "Erreur conversion MarkerData -> MarkerDataStandardized: " + e.getMessage());
+                Log.e("FetchingManager", "Erreur conversion BusTrackerMarkerData -> MarkerDataStandardized: " + e.getMessage());
             }
         }
 

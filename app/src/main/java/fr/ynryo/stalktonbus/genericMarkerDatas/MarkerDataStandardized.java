@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.MarkerData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleStop;
 import fr.ynryo.stalktonbus.utils.Time;
@@ -53,45 +53,45 @@ public class MarkerDataStandardized {
     // ==================== CONVERSION ====================
 
     /**
-     * Converts a {@link MarkerData} object into a {@link MarkerDataStandardized} object with the specified {@link MarkerType}.
+     * Converts a {@link BusTrackerMarkerData} object into a {@link MarkerDataStandardized} object with the specified {@link MarkerType}.
      *
-     * @param markerData the source {@link MarkerData} object containing the data to be converted
+     * @param busTrackerMarkerData the source {@link BusTrackerMarkerData} object containing the data to be converted
      * @param type       the {@link MarkerType} to be associated with the resulting {@link MarkerDataStandardized} object
-     * @return a {@link MarkerDataStandardized} object populated with the data from the given {@link MarkerData} and the specified {@link MarkerType
+     * @return a {@link MarkerDataStandardized} object populated with the data from the given {@link BusTrackerMarkerData} and the specified {@link MarkerType
      * }
      */
-    public static MarkerDataStandardized createNewMarkerFrom(@NonNull MarkerData markerData, @NonNull MarkerType type) {
+    public static MarkerDataStandardized createNewMarkerFrom(@NonNull BusTrackerMarkerData busTrackerMarkerData, @NonNull MarkerType type) {
         MarkerDataStandardized marker = new MarkerDataStandardized();
 
         boolean isTrain = (type == MarkerType.TRAIN);
         int lineId = 0;
-        if (isTrain && markerData.getVehicleNumber() != null) {
+        if (isTrain && busTrackerMarkerData.getVehicleNumber() != null) {
             try {
-                lineId = Integer.parseInt(markerData.getVehicleNumber());
+                lineId = Integer.parseInt(busTrackerMarkerData.getVehicleNumber());
             } catch (NumberFormatException ignored) {
             }
         }
-        String lineNumber = isTrain ? markerData.getVehicleNumber() : markerData.getLineNumber();
+        String lineNumber = isTrain ? busTrackerMarkerData.getVehicleNumber() : busTrackerMarkerData.getLineNumber();
 
         marker.markerIdentity = new MarkerIdentity(
                 type,
-                markerData.getId(),
+                busTrackerMarkerData.getId(),
                 lineId,
                 lineNumber,
-                markerData.getNetworkRef()
+                busTrackerMarkerData.getNetworkRef()
         );
-        if (markerData.getPosition() != null) {
+        if (busTrackerMarkerData.getPosition() != null) {
             marker.markerPosition = new MarkerPosition(
-                    markerData.getPosition().getLatitude(),
-                    markerData.getPosition().getLongitude(),
-                    markerData.getPosition().getBearing()
+                    busTrackerMarkerData.getPosition().getLatitude(),
+                    busTrackerMarkerData.getPosition().getLongitude(),
+                    busTrackerMarkerData.getPosition().getBearing()
             );
         } else {
             marker.markerPosition = new MarkerPosition();
         }
         marker.markerStyle = new MarkerStyle(
-                markerData.getColor(),
-                markerData.getFillColor()
+                busTrackerMarkerData.getColor(),
+                busTrackerMarkerData.getFillColor()
         );
         marker.createdAt = Time.now();
         marker.lastUpdatedAt = Time.now();

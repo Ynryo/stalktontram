@@ -2,7 +2,7 @@ package fr.ynryo.stalktonbus.apiResponsesPOJO.bus;
 
 import androidx.annotation.NonNull;
 
-public class BusGeometry {
+public class BusTrackerPath {
     private Object p;
 
     public Object getGeometry() {
@@ -12,7 +12,7 @@ public class BusGeometry {
     @NonNull
     @Override
     public String toString() {
-        return "BusGeometry{" +
+        return "BusTrackerPath{" +
                 "geometry=" + p +
                 '}';
     }

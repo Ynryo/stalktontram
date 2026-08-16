@@ -2,7 +2,7 @@ package fr.ynryo.stalktonbus.apiResponsesPOJO.markers;
 
 import androidx.annotation.NonNull;
 
-public class MarkerPosition {
+public class BusTrackerMarkerPosition {
     private double latitude;
     private double longitude;
     private float bearing;
@@ -32,7 +32,7 @@ public class MarkerPosition {
     @NonNull
     @Override
     public String toString() {
-        return "MarkerPosition{" +
+        return "BusTrackerMarkerPosition{" +
                 "latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", bearing=" + bearing +

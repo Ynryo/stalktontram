@@ -28,8 +28,8 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
 
-import fr.ynryo.stalktonbus.apiResponsesPOJO.network.NetworkData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.region.RegionData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.version.VersionResponse;
 import fr.ynryo.stalktonbus.artists.MarkerArtist;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private boolean isMapReady = false;
     private boolean isDataReady = false;
-    private List<RegionData> pendingRegions;
-    private List<NetworkData> pendingNetworks;
+    private List<BusTrackerRegionData> pendingRegions;
+    private List<BusTrackerNetworkData> pendingNetworks;
 
     private boolean isFetching = false;
     private GoogleMap googleMap;
@@ -124,10 +124,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         fetcher.fetchRegions(new FetchingManager.OnRegionsListener() {
             @Override
-            public void onResponseRegionsListener(List<RegionData> regions) {
+            public void onResponseRegionsListener(List<BusTrackerRegionData> regions) {
                 fetcher.fetchNetworks(new FetchingManager.OnNetworkListener() {
                     @Override
-                    public void onResponseNetworkListener(List<NetworkData> data) {
+                    public void onResponseNetworkListener(List<BusTrackerNetworkData> data) {
                         pendingRegions = regions;
                         pendingNetworks = data;
                         isDataReady = true;

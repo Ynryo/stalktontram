@@ -2,10 +2,10 @@ package fr.ynryo.stalktonbus;
 
 import java.util.List;
 
-import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusGeometry;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.MarkersList;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.network.NetworkData;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.region.RegionData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerPath;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkersList;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.VehicleData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.version.VersionResponse;
 import retrofit2.Call;
@@ -26,7 +26,7 @@ public interface ApiService {
      * @param lineId id de ligne optionnel
      */
     @GET("vehicle-journeys/markers")
-    Call<MarkersList> getVehicleMarkers(
+    Call<BusTrackerMarkersList> getVehicleMarkers(
         @Query("swLat") double swLat,
         @Query("swLon") double swLon,
         @Query("neLat") double neLat,
@@ -40,18 +40,18 @@ public interface ApiService {
     );
 
     @GET("regions")
-    Call<List<RegionData>> getRegions();
+    Call<List<BusTrackerRegionData>> getRegions();
 
     @GET("networks")
-    Call<List<NetworkData>> getNetworks();
+    Call<List<BusTrackerNetworkData>> getNetworks();
 
     @GET("networks/{networkId}?withDetails=true")
-    Call<NetworkData> getNetworkData(
+    Call<BusTrackerNetworkData> getNetworkData(
         @Path(value = "networkId") int networkId
     );
 
     @GET("paths/{pathRef}")
-    Call<BusGeometry> getBusLine(
+    Call<BusTrackerPath> getPath(
         @Path(value = "pathRef", encoded = true) String pathRef
     );
 

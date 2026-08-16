@@ -22,7 +22,7 @@ import java.util.List;
 
 import fr.ynryo.stalktonbus.MainActivity;
 import fr.ynryo.stalktonbus.R;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusGeometry;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerPath;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStop;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
@@ -56,7 +56,7 @@ public class RouteArtist {
                         remove();
                         try {
                             List<List<Double>> allPoints;
-                            Object geometry = ((BusGeometry) mData.getMarkerDataRoute()).getGeometry();
+                            Object geometry = ((BusTrackerPath) mData.getMarkerDataRoute()).getGeometry();
                             if (geometry instanceof List) {
                                 allPoints = (List<List<Double>>) geometry;
                                 for (List<Double> point : allPoints) {

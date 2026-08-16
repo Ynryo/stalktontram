@@ -2,11 +2,11 @@ package fr.ynryo.stalktonbus.apiResponsesPOJO.region;
 
 import androidx.annotation.NonNull;
 
-public class RegionData {
+public class BusTrackerRegionData {
     private int id;
     private String name;
 
-    public RegionData(int id, String name) {
+    public BusTrackerRegionData(int id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -22,7 +22,7 @@ public class RegionData {
     @NonNull
     @Override
     public String toString() {
-        return "RegionData{" +
+        return "BusTrackerRegionData{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';

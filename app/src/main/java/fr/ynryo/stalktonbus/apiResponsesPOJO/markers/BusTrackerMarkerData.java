@@ -2,11 +2,11 @@ package fr.ynryo.stalktonbus.apiResponsesPOJO.markers;
 
 import androidx.annotation.NonNull;
 
-public class MarkerData {
+public class BusTrackerMarkerData {
     private String id;
     private String lineNumber;
     private String vehicleNumber;
-    private MarkerPosition position;
+    private BusTrackerMarkerPosition position;
     private String fillColor;
     private String color;
 
@@ -22,7 +22,7 @@ public class MarkerData {
         return vehicleNumber;
     }
 
-    public MarkerPosition getPosition() {
+    public BusTrackerMarkerPosition getPosition() {
         return position;
     }
 
@@ -42,7 +42,7 @@ public class MarkerData {
     @NonNull
     @Override
     public String toString() {
-        return "MarkerData{" +
+        return "BusTrackerMarkerData{" +
                 "id='" + id + '\'' +
                 ", lineNumber='" + lineNumber + '\'' +
                 ", vehicleNumber='" + vehicleNumber + '\'' +

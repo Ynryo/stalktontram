@@ -1,6 +1,6 @@
 package fr.ynryo.stalktonbus.apiResponsesPOJO.platform;
 
-public class PlatformData {
+public class BusTrackerPlatformData {
     private String platform;
     private int count;
     private float percentage;

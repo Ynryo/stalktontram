@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -42,14 +41,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.ynryo.stalktonbus.apiResponsesPOJO.network.NetworkData;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStop;
 import fr.ynryo.stalktonbus.genericMarkerDatas.StopPlatform;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
-import fr.ynryo.stalktonbus.managers.um.TimelineRowType;
-import fr.ynryo.stalktonbus.managers.um.TrainUmAssembler;
-import fr.ynryo.stalktonbus.managers.um.TrainUmTimelineRow;
 import fr.ynryo.stalktonbus.utils.Time;
 
 public class MarkerStopsDetailActivity {
@@ -191,7 +187,7 @@ public class MarkerStopsDetailActivity {
 
         context.getFetcher().fetchNetworkData(markerDataStandardized.getNetworkId(), new FetchingManager.OnNetworkDataListener() {
             @Override
-            public void onResponseNetworkDataListener(NetworkData nData) {
+            public void onResponseNetworkDataListener(BusTrackerNetworkData nData) {
                 loadNetworkLogo(view, nData.getLogoHref());
             }
 

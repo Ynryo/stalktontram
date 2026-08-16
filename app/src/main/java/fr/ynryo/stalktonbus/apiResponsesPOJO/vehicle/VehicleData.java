@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.MarkerPosition;
+import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerPosition;
 
 //bus tracker api response
 public class VehicleData {
@@ -15,7 +15,7 @@ public class VehicleData {
     private String direction;
     private String destination;
     private List<VehicleStop> calls;
-    private MarkerPosition position;
+    private BusTrackerMarkerPosition position;
     private int networkId;
     private String serviceDate;
     private String pathRef;
@@ -42,7 +42,7 @@ public class VehicleData {
         return calls;
     }
 
-    public MarkerPosition getPosition() {
+    public BusTrackerMarkerPosition getPosition() {
         return position;
     }
 
