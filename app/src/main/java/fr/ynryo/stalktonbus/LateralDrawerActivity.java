@@ -23,7 +23,7 @@ import java.util.Map;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
 import fr.ynryo.stalktonbus.managers.SaveManager;
 import fr.ynryo.stalktonbus.managers.favorite.Favorite;
@@ -221,8 +221,8 @@ public class LateralDrawerActivity {
 
             context.getFetcher().fetchMarkers(new FetchingManager.OnMarkersListener() {
                 @Override
-                public void onResponseMarkersListener(List<MarkerDataStandardized> markerDataStandardizedList) {
-                    context.getMarkerArtist().showMarkers(markerDataStandardizedList);
+                public void onResponseMarkersListener(List<MarkerStandardized> markerStandardizedList) {
+                    context.getMarkerArtist().showMarkers(markerStandardizedList);
                 }
 
                 @Override
@@ -346,8 +346,8 @@ public class LateralDrawerActivity {
 
                     context.getFetcher().fetchMarkers(new FetchingManager.OnMarkersListener() {
                         @Override
-                        public void onResponseMarkersListener(List<MarkerDataStandardized> markerDataStandardizedList) {
-                            context.getMarkerArtist().showMarkers(markerDataStandardizedList);
+                        public void onResponseMarkersListener(List<MarkerStandardized> markerStandardizedList) {
+                            context.getMarkerArtist().showMarkers(markerStandardizedList);
                         }
 
                         @Override
@@ -433,12 +433,12 @@ public class LateralDrawerActivity {
             // fetch markers for favorite line
             context.getFetcher().fetchMarkers(lineIdStr, new FetchingManager.OnMarkersListener() {
                 @Override
-                public void onResponseMarkersListener(List<MarkerDataStandardized> markerDataStandardizedList) {
+                public void onResponseMarkersListener(List<MarkerStandardized> markerStandardizedList) {
                     // filtrer uniquement les véhicules de la ligne
-                    for (MarkerDataStandardized vehicle : markerDataStandardizedList) {
+                    for (MarkerStandardized vehicle : markerStandardizedList) {
                         context.getFetcher().fetchVehicleStopsInfo(vehicle, new FetchingManager.OnVehicleDetailsListener() {
                             @Override
-                            public void onResponseVehicleDetailsListener(MarkerDataStandardized markerDetails) {
+                            public void onResponseVehicleDetailsListener(MarkerStandardized markerDetails) {
                                 if (f.getDestination().equals(markerDetails.getDestination())) {
                                     View vehicleView = LayoutInflater.from(context).inflate(R.layout.favorite_line_item, lineVehiclesContainer, false);
                                     ImageView ivMarker = vehicleView.findViewById(R.id.iv_marker);

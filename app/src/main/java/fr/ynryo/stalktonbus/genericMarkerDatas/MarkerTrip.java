@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MarkerTrip {
     private String destination; // Destination finale
-    private List<MarkerDataStop> stops; // Liste des arrêts à venir
+    private List<MarkerStop> stops; // Liste des arrêts à venir
     private boolean atStop;
     private float distanceTraveled;
     private String pathRef; // Référence du tracé
@@ -22,7 +22,7 @@ public class MarkerTrip {
         this.markerDataRoute = null;
     }
 
-    public MarkerTrip(String destination, List<MarkerDataStop> stops, boolean atStop, float distanceTraveled, String pathRef, Object markerDataRoute) {
+    public MarkerTrip(String destination, List<MarkerStop> stops, boolean atStop, float distanceTraveled, String pathRef, Object markerDataRoute) {
         this.destination = destination;
         this.stops = stops;
         this.atStop = atStop;
@@ -39,11 +39,11 @@ public class MarkerTrip {
         this.destination = destination;
     }
 
-    public List<MarkerDataStop> getStops() {
+    public List<MarkerStop> getStops() {
         return stops;
     }
 
-    public void setStops(List<MarkerDataStop> stops) {
+    public void setStops(List<MarkerStop> stops) {
         this.stops = stops;
     }
 

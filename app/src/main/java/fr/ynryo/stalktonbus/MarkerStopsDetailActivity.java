@@ -43,9 +43,9 @@ import java.util.List;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStop;
-import fr.ynryo.stalktonbus.genericMarkerDatas.StopPlatform;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStop;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStopPlatform;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
 import fr.ynryo.stalktonbus.utils.Time;
 
@@ -61,21 +61,21 @@ public class MarkerStopsDetailActivity {
         this.context = contextRef.get();
     }
 
-    public void open(MarkerDataStandardized markerDataStandardized) {
+    public void open(MarkerStandardized markerStandardized) {
         if (this.context == null) return;
         close();
 
         bottomSheetDialog = new BottomSheetDialog(context);
-        vehicleId = markerDataStandardized.getId();
+        vehicleId = markerStandardized.getId();
 
         View view = LayoutInflater.from(context).inflate(R.layout.vehicle_details, null);
         bottomSheetDialog.setContentView(view);
         setupBottomSheetAppearance(view);
-        setupLineHeader(view, markerDataStandardized);
-        setupLoader(view, markerDataStandardized);
+        setupLineHeader(view, markerStandardized);
+        setupLoader(view, markerStandardized);
 
         bottomSheetDialog.show();
-        fetchVehicleData(markerDataStandardized, view);
+        fetchVehicleData(markerStandardized, view);
     }
 
     public void close() {
@@ -124,22 +124,22 @@ public class MarkerStopsDetailActivity {
         return (int) (screenHeight * 0.5);
     }
 
-    private void setupLineHeader(View view, MarkerDataStandardized markerDataStandardized) {
+    private void setupLineHeader(View view, MarkerStandardized markerStandardized) {
         TextView tvLigne = view.findViewById(R.id.tvLigneNumero);
 
-        String lineNumber = markerDataStandardized.getLineNumber();
+        String lineNumber = markerStandardized.getLineNumber();
         tvLigne.setText(lineNumber);
 
-        int fillColor = Color.parseColor(markerDataStandardized.getFillColor() != null ? markerDataStandardized.getFillColor() : "#424242");
-        int textColor = Color.parseColor(markerDataStandardized.getTextColor() != null ? markerDataStandardized.getTextColor() : "#FFFFFF");
+        int fillColor = Color.parseColor(markerStandardized.getFillColor() != null ? markerStandardized.getFillColor() : "#424242");
+        int textColor = Color.parseColor(markerStandardized.getTextColor() != null ? markerStandardized.getTextColor() : "#FFFFFF");
 
         tvLigne.setBackgroundColor(fillColor);
         tvLigne.setTextColor(textColor);
     }
 
-    private void setupLoader(View view, MarkerDataStandardized markerDataStandardized) {
+    private void setupLoader(View view, MarkerStandardized markerStandardized) {
         ProgressBar loader = view.findViewById(R.id.loader);
-        int fillColor = Color.parseColor(markerDataStandardized.getFillColor() != null ? markerDataStandardized.getFillColor() : "#424242");
+        int fillColor = Color.parseColor(markerStandardized.getFillColor() != null ? markerStandardized.getFillColor() : "#424242");
 
         loader.setVisibility(View.VISIBLE);
         loader.setIndeterminateTintList(ColorStateList.valueOf(fillColor));
@@ -152,21 +152,21 @@ public class MarkerStopsDetailActivity {
     /**
      * Fetch data from API
      *
-     * @param markerDataStandardized the marker data
+     * @param markerStandardized the marker data
      * @param view                   the view
      */
-    private void fetchVehicleData(MarkerDataStandardized markerDataStandardized, View view) {
-        context.getFetcher().fetchVehicleStopsInfo(markerDataStandardized, new FetchingManager.OnVehicleDetailsListener() {
+    private void fetchVehicleData(MarkerStandardized markerStandardized, View view) {
+        context.getFetcher().fetchVehicleStopsInfo(markerStandardized, new FetchingManager.OnVehicleDetailsListener() {
             @Override
-            public void onResponseVehicleDetailsListener(MarkerDataStandardized markerDataStandardized) {
+            public void onResponseVehicleDetailsListener(MarkerStandardized markerStandardized) {
                 hideLoader(view);
 
                 if (context.getMarkerArtist() != null) {
-                    context.getMarkerArtist().getRouteArtist().drawVehicleRoute(markerDataStandardized);
+                    context.getMarkerArtist().getRouteArtist().drawVehicleRoute(markerStandardized);
                 }
 
-                showVehicleDetails(markerDataStandardized, view);
-                fetchNetworkLogo(markerDataStandardized, view);
+                showVehicleDetails(markerStandardized, view);
+                fetchNetworkLogo(markerStandardized, view);
             }
 
             @Override
@@ -180,13 +180,13 @@ public class MarkerStopsDetailActivity {
     /**
      * Fetch network logo from API
      *
-     * @param markerDataStandardized the marker data
+     * @param markerStandardized the marker data
      * @param view                   the view
      */
-    private void fetchNetworkLogo(MarkerDataStandardized markerDataStandardized, View view) {
-        if (markerDataStandardized.getNetworkId() == 0) return;
+    private void fetchNetworkLogo(MarkerStandardized markerStandardized, View view) {
+        if (markerStandardized.getNetworkId() == 0) return;
 
-        context.getFetcher().fetchNetworkData(markerDataStandardized.getNetworkId(), new FetchingManager.OnNetworkDataListener() {
+        context.getFetcher().fetchNetworkData(markerStandardized.getNetworkId(), new FetchingManager.OnNetworkDataListener() {
             @Override
             public void onResponseNetworkDataListener(BusTrackerNetworkData nData) {
                 loadNetworkLogo(view, nData.getLogoHref());
@@ -244,27 +244,27 @@ public class MarkerStopsDetailActivity {
     /**
      * Show vehicle details from marker data
      *
-     * @param markerDataStandardized the marker data
+     * @param markerStandardized the marker data
      * @param view                   the view
      */
-    private void showVehicleDetails(MarkerDataStandardized markerDataStandardized, View view) {
-        context.getFollowManager().setFollowButton(view.findViewById(R.id.followButton), markerDataStandardized.getId());
-        context.getFavoriteManager().setFavoriteButton(view.findViewById(R.id.favoriteButton), markerDataStandardized);
+    private void showVehicleDetails(MarkerStandardized markerStandardized, View view) {
+        context.getFollowManager().setFollowButton(view.findViewById(R.id.followButton), markerStandardized.getId());
+        context.getFavoriteManager().setFavoriteButton(view.findViewById(R.id.favoriteButton), markerStandardized);
 
-        setupDestinationText(view, markerDataStandardized);
-        StopsAdapter adapter = setupStopsList(view, markerDataStandardized);
-        fetchGuessPlatforms(markerDataStandardized, adapter);
+        setupDestinationText(view, markerStandardized);
+        StopsAdapter adapter = setupStopsList(view, markerStandardized);
+        fetchGuessPlatforms(markerStandardized, adapter);
     }
 
     /**
      * Setup destination text from marker data
      *
      * @param view                   the view
-     * @param markerDataStandardized the marker data
+     * @param markerStandardized the marker data
      */
-    private void setupDestinationText(View view, MarkerDataStandardized markerDataStandardized) {
+    private void setupDestinationText(View view, MarkerStandardized markerStandardized) {
         TextView tvDestination = view.findViewById(R.id.tvDestination);
-        tvDestination.setText(markerDataStandardized.getDestination());
+        tvDestination.setText(markerStandardized.getDestination());
         tvDestination.setSingleLine(true);
         tvDestination.setEllipsize(TextUtils.TruncateAt.MARQUEE);
         tvDestination.setMarqueeRepeatLimit(-1);
@@ -272,15 +272,15 @@ public class MarkerStopsDetailActivity {
         tvDestination.setSelected(true);
     }
 
-    private StopsAdapter setupStopsList(View view, MarkerDataStandardized markerDataStandardized) {
+    private StopsAdapter setupStopsList(View view, MarkerStandardized markerStandardized) {
         RecyclerView rvStops = view.findViewById(R.id.rvStops);
         rvStops.setLayoutManager(new LinearLayoutManager(context));
 
-//        if (markerDataStandardized.isUm()) {
-//            List<TrainUmTimelineRow> rows = TrainUmAssembler.assembleUmStops(markerDataStandardized);
-//            rvStops.setAdapter(new UmStopsAdapter(markerDataStandardized, rows));
+//        if (markerStandardized.isUm()) {
+//            List<TrainUmTimelineRow> rows = TrainUmAssembler.assembleUmStops(markerStandardized);
+//            rvStops.setAdapter(new UmStopsAdapter(markerStandardized, rows));
 //        } else {
-            List<MarkerDataStop> stops = markerDataStandardized.getStops() != null ? markerDataStandardized.getStops() : new ArrayList<>();
+        List<MarkerStop> stops = markerStandardized.getStops() != null ? markerStandardized.getStops() : new ArrayList<>();
         StopsAdapter adapter = new StopsAdapter(stops);
         rvStops.setAdapter(adapter);
 //        }
@@ -289,17 +289,15 @@ public class MarkerStopsDetailActivity {
         return adapter;
     }
 
-    private void fetchGuessPlatforms(MarkerDataStandardized markerDataStandardized, StopsAdapter adapter) {
-        if (!markerDataStandardized.isTrain()) return;
+    private void fetchGuessPlatforms(MarkerStandardized markerStandardized, StopsAdapter adapter) {
+        if (!markerStandardized.isTrain()) return;
 
-        String rawTrainNum = markerDataStandardized.getLineNumber();
-        if (rawTrainNum == null || rawTrainNum.isEmpty()) return;
-        final String trainNum = rawTrainNum.replaceAll("[^0-9]", "");
-        if (trainNum.isEmpty()) return;
+        String trainNum = markerStandardized.getLineNumber();
+        if (trainNum == null || trainNum.isEmpty()) return;
 
-        List<MarkerDataStop> stops = markerDataStandardized.getStops();
+        List<MarkerStop> stops = markerStandardized.getStops();
         for (int i = 0; i < stops.size(); i++) {
-            MarkerDataStop stop = stops.get(i);
+            MarkerStop stop = stops.get(i);
             // Si l'arrêt a déjà un quai officiel renseigné (100%), on ne fait pas de requête CartoTchoo
             if (stop.getPlatform() != null && stop.getPlatform().getPlatformName() != null && !stop.getPlatform().getPlatformName().isEmpty()) {
                 continue;
@@ -314,7 +312,7 @@ public class MarkerStopsDetailActivity {
                 public void onResponseGuessPlatformListener(List<CartoTchooGuessPlatform> cartoTchooGuessPlatform) {
                     Log.d(TAG, "Réponse guess platform pour UIC " + uic + ": " + cartoTchooGuessPlatform);
                     if (cartoTchooGuessPlatform != null && !cartoTchooGuessPlatform.isEmpty()) {
-                        markerDataStandardized.setGuessStopPlatform(uic, cartoTchooGuessPlatform);
+                        markerStandardized.setGuessStopPlatform(uic, cartoTchooGuessPlatform);
                         if (adapter != null) {
                             adapter.notifyItemChanged(position);
                         }
@@ -333,7 +331,7 @@ public class MarkerStopsDetailActivity {
         return vehicleId;
     }
 
-    private static int getTimelineLayout(MarkerDataStop stop, int position, int itemCount) {
+    private static int getTimelineLayout(MarkerStop stop, int position, int itemCount) {
         boolean isFirstStop = stop.isDepartureStop();
         boolean isLastStop = position == itemCount - 1 || stop.isDestinationStop();
         if (isFirstStop) {
@@ -376,14 +374,14 @@ public class MarkerStopsDetailActivity {
         private static final int TYPE_STOP = 0;
         private static final int TYPE_EMPTY = 1;
 
-        private final List<MarkerDataStop> stops;
+        private final List<MarkerStop> stops;
 
         /**
          * Constructor
          *
          * @param stops the list of stops
          */
-        StopsAdapter(List<MarkerDataStop> stops) {
+        StopsAdapter(List<MarkerStop> stops) {
             this.stops = stops;
         }
 
@@ -429,7 +427,7 @@ public class MarkerStopsDetailActivity {
                 return;
             }
 
-            MarkerDataStop stop = stops.get(position);
+            MarkerStop stop = stops.get(position);
             bindStopViewHolder((StopViewHolder) holder, stop, position, stops.size());
         }
 
@@ -479,7 +477,7 @@ public class MarkerStopsDetailActivity {
             return new StopViewHolder(view);
         } //inflate item stop
 
-        private void bindStopViewHolder(StopViewHolder vh, MarkerDataStop stop, int position, int itemCount) { //distribute data
+        private void bindStopViewHolder(StopViewHolder vh, MarkerStop stop, int position, int itemCount) { //distribute data
             bindTimeline(vh, stop, position, itemCount);
             bindPlatform(vh, stop);
             bindStopName(vh, stop);
@@ -489,8 +487,8 @@ public class MarkerStopsDetailActivity {
             bindDelay(vh, stop);
         }
 
-        public void bindTimeline(StopViewHolder vh, MarkerDataStop stop, int position, int itemCount) {
-            MarkerDataStandardized vehicle = stop.getVehicle();
+        public void bindTimeline(StopViewHolder vh, MarkerStop stop, int position, int itemCount) {
+            MarkerStandardized vehicle = stop.getVehicle();
 
             vh.flTimeline.setVisibility(View.VISIBLE);
             vh.flTimeline.removeAllViews();
@@ -508,8 +506,8 @@ public class MarkerStopsDetailActivity {
                 ((GradientDrawable) lineView.getBackground().mutate()).setColor(fillColor);
         }
 
-        private void bindPlatform(StopViewHolder vh, MarkerDataStop stop) {
-            StopPlatform platform = stop.getPlatform();
+        private void bindPlatform(StopViewHolder vh, MarkerStop stop) {
+            MarkerStopPlatform platform = stop.getPlatform();
             if (platform != null && platform.getPlatformName() != null) {
                 vh.tvPlatform.setText(platform.getPlatformName());
                 vh.llPlatformContainer.setVisibility(View.VISIBLE);
@@ -526,7 +524,7 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindStopName(StopViewHolder vh, MarkerDataStop stop) {
+        private void bindStopName(StopViewHolder vh, MarkerStop stop) {
             SpannableStringBuilder builder = new SpannableStringBuilder(stop.getStopName());
 
             int iconRes = getStopIconResource(stop);
@@ -538,7 +536,7 @@ public class MarkerStopsDetailActivity {
             vh.tvStopName.setSelected(true);
         }
 
-        private int getStopIconResource(MarkerDataStop stop) {
+        private int getStopIconResource(MarkerStop stop) {
             if (stop.cantPickup()) return R.drawable.icon_logout;
             if (stop.cantDropoff()) return R.drawable.icon_login;
             return 0;
@@ -556,8 +554,8 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindArrivalTime(StopViewHolder vh, MarkerDataStop stop) {
-            MarkerDataStandardized vehicle = stop.getVehicle();
+        private void bindArrivalTime(StopViewHolder vh, MarkerStop stop) {
+            MarkerStandardized vehicle = stop.getVehicle();
             if (stop.isDepartureStop()) {
                 vh.tvArrivingTime.setVisibility(View.GONE);
                 return;
@@ -574,8 +572,8 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindAtStopTime(StopViewHolder vh, MarkerDataStop stop) {
-            MarkerDataStandardized vehicle = stop.getVehicle();
+        private void bindAtStopTime(StopViewHolder vh, MarkerStop stop) {
+            MarkerStandardized vehicle = stop.getVehicle();
             if (!vehicle.isTrain() || stop.isDestinationStop() || stop.isDepartureStop()) {
                 vh.tvAtStopTime.setVisibility(View.GONE);
                 return;
@@ -590,7 +588,7 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindDepartureTime(StopViewHolder vh, MarkerDataStop stop) {
+        private void bindDepartureTime(StopViewHolder vh, MarkerStop stop) {
             if (stop.isDestinationStop()) {
                 vh.tvDepartureTime.setVisibility(View.GONE);
                 return;
@@ -607,7 +605,7 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindOnLive(ImageView ivTimeIcon, MarkerDataStop stop) {
+        private void bindOnLive(ImageView ivTimeIcon, MarkerStop stop) {
             if (stop.isOnLive()) {
                 ivTimeIcon.setImageResource(R.drawable.icon_sensors);
                 ivTimeIcon.setColorFilter(COLOR_GREEN);
@@ -621,7 +619,7 @@ public class MarkerStopsDetailActivity {
             }
         }
 
-        private void bindDelay(StopViewHolder vh, MarkerDataStop stop) {
+        private void bindDelay(StopViewHolder vh, MarkerStop stop) {
             vh.tvDelay.setVisibility(View.GONE);
 
             if (stop.getDelay() == null || stop.getDelay() == 0) return;
@@ -692,10 +690,10 @@ public class MarkerStopsDetailActivity {
 //        private static final int TYPE_MERGE = 1;
 //        private static final int TYPE_SPLIT = 2;
 //
-//        private final MarkerDataStandardized umMarker;
+//        private final MarkerStandardized umMarker;
 //        private final List<TrainUmTimelineRow> rows;
 //
-//        UmStopsAdapter(MarkerDataStandardized umMarker, List<TrainUmTimelineRow> rows) {
+//        UmStopsAdapter(MarkerStandardized umMarker, List<TrainUmTimelineRow> rows) {
 //            this.umMarker = umMarker;
 //            this.rows = rows;
 //        }
@@ -732,8 +730,8 @@ public class MarkerStopsDetailActivity {
 //            TrainUmTimelineRow row = rows.get(position);
 //            int viewType = getItemViewType(position);
 //
-//            MarkerDataStandardized trainA = umMarker.getUmA();
-//            MarkerDataStandardized trainB = umMarker.getUmB();
+//            MarkerStandardized trainA = umMarker.getUmA();
+//            MarkerStandardized trainB = umMarker.getUmB();
 //            int colorA = Color.parseColor(trainA.getFillColor() != null ? trainA.getFillColor() : "#424242");
 //            int colorB = Color.parseColor(trainB.getFillColor() != null ? trainB.getFillColor() : "#424242");
 //
@@ -777,8 +775,8 @@ public class MarkerStopsDetailActivity {
 //        }
 //
 //        private void bindStopRow(UmStopViewHolder vh, TrainUmTimelineRow row, int colorA, int colorB) {
-//            MarkerDataStop stopA = row.getStopA();
-//            MarkerDataStop stopB = row.getStopB();
+//            MarkerStop stopA = row.getStopA();
+//            MarkerStop stopB = row.getStopB();
 //
 //            // 1. Bind Timeline
 //            bindTimeline(vh, row);
@@ -810,15 +808,15 @@ public class MarkerStopsDetailActivity {
 //            bindStopName(vh.tvStopName, stopName, iconRes);
 //
 //            // 3. Determine Platform
-//            StopPlatform platform = null;
+//            MarkerStopPlatform platform = null;
 //            if (stopA != null && stopB != null) {
-//                StopPlatform platA = stopA.getPlatform();
-//                StopPlatform platB = stopB.getPlatform();
+//                MarkerStopPlatform platA = stopA.getPlatform();
+//                MarkerStopPlatform platB = stopB.getPlatform();
 //                if (platA != null && platB != null) {
 //                    if (platA.equals(platB)) {
 //                        platform = platA;
 //                    } else {
-//                        platform = new StopPlatform(platA + "/" + platB);
+//                        platform = new MarkerStopPlatform(platA + "/" + platB);
 //                    }
 //                } else if (platA != null) {
 //                    platform = platA;
@@ -858,8 +856,8 @@ public class MarkerStopsDetailActivity {
 //            View vLineRight = timelineView.findViewById(R.id.vLineRight);
 //            View vStopDotRight = timelineView.findViewById(R.id.vStopDotRight);
 //
-//            MarkerDataStandardized trainA = umMarker.getUmA();
-//            MarkerDataStandardized trainB = umMarker.getUmB();
+//            MarkerStandardized trainA = umMarker.getUmA();
+//            MarkerStandardized trainB = umMarker.getUmB();
 //
 //            int colorA = Color.parseColor(trainA.getFillColor() != null ? trainA.getFillColor() : "#424242");
 //            int colorB = Color.parseColor(trainB.getFillColor() != null ? trainB.getFillColor() : "#424242");
@@ -908,7 +906,7 @@ public class MarkerStopsDetailActivity {
 //            }
 //        }
 //
-//        private void bindTrainColumn(MarkerDataStop stop, LinearLayout container, TextView tvArrival, ImageView ivArrivalIcon, TextView tvAtStop, TextView tvDeparture, ImageView ivDepartureIcon, TextView tvDelay) {
+//        private void bindTrainColumn(MarkerStop stop, LinearLayout container, TextView tvArrival, ImageView ivArrivalIcon, TextView tvAtStop, TextView tvDeparture, ImageView ivDepartureIcon, TextView tvDelay) {
 //            if (stop == null) {
 //                container.setVisibility(View.GONE);
 //                return;
@@ -978,7 +976,7 @@ public class MarkerStopsDetailActivity {
 //            }
 //        }
 //
-//        private void bindPlatform(TextView tvPlatform, View spacerPlatform, StopPlatform platform) {
+//        private void bindPlatform(TextView tvPlatform, View spacerPlatform, MarkerStopPlatform platform) {
 //            if (platform != null) {
 //                tvPlatform.setText(platform.getPlatformName());
 //                tvPlatform.setVisibility(View.VISIBLE);
@@ -1017,7 +1015,7 @@ public class MarkerStopsDetailActivity {
 //            }
 //        }
 //
-//        private int getStopIconResource(MarkerDataStop stop) {
+//        private int getStopIconResource(MarkerStop stop) {
 //            if (stop.cantPickup()) return R.drawable.icon_logout;
 //            if (stop.cantDropoff()) return R.drawable.icon_login;
 //            return 0;

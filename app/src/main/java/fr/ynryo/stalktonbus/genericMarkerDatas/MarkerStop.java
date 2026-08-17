@@ -7,10 +7,10 @@ import androidx.annotation.Nullable;
 
 import fr.ynryo.stalktonbus.utils.Time;
 
-public class MarkerDataStop {
+public class MarkerStop {
     private String stopRef; // Identifiant unique de l'arrêt
     private String stopName; // Nom de l'arrêt
-    private StopPlatform platform; // Quai/Platform (ex: "A3", "Voie 2")
+    private MarkerStopPlatform platform; // Quai/Platform (ex: "A3", "Voie 2")
     private Time arrivalTime; // Heure d'arrivée
     private Time departureTime; // Heure de départ
     private Long delay; // Retard/décalage par rapport à l'horaire prévu
@@ -22,39 +22,46 @@ public class MarkerDataStop {
     private boolean isOnLive; // Statut de l'appel (EXPECTED, ACTUAL, etc.)
     private boolean isDestinationStop = false;
     private boolean isDepartureStop = false;
-    private MarkerDataStandardized vehicle; // Véhicle parent
+    private MarkerStandardized vehicle; // Véhicle parent
 
-    private final static String TAG = "MarkerDataStop";
+    private final static String TAG = "MarkerStop";
 
     // ==================== CONSTRUCTEURS ====================
-    public MarkerDataStop() {
+    public MarkerStop() {
         this.stopType = StopType.BOTH;
     }
 
-    public MarkerDataStop(MarkerDataStop markerDataStop) {
-        this.stopRef = markerDataStop.stopRef;
-        this.stopName = markerDataStop.stopName;
-        this.platform = markerDataStop.platform;
-        this.arrivalTime = markerDataStop.arrivalTime;
-        this.departureTime = markerDataStop.departureTime;
-        this.delay = markerDataStop.delay;
-        this.stopType = markerDataStop.stopType;
-        this.distanceTraveled = markerDataStop.distanceTraveled;
-        this.latitude = markerDataStop.latitude;
-        this.longitude = markerDataStop.longitude;
-        this.stopOrder = markerDataStop.stopOrder;
-        this.isOnLive = markerDataStop.isOnLive;
-        this.isDestinationStop = markerDataStop.isDestinationStop;
-        this.isDepartureStop = markerDataStop.isDepartureStop;
-        this.vehicle = markerDataStop.vehicle;
+    public MarkerStop(MarkerStop markerStop) {
+        this.stopRef = markerStop.stopRef;
+        this.stopName = markerStop.stopName;
+        this.platform = markerStop.platform;
+        this.arrivalTime = markerStop.arrivalTime;
+        this.departureTime = markerStop.departureTime;
+        this.delay = markerStop.delay;
+        this.stopType = markerStop.stopType;
+        this.distanceTraveled = markerStop.distanceTraveled;
+        this.latitude = markerStop.latitude;
+        this.longitude = markerStop.longitude;
+        this.stopOrder = markerStop.stopOrder;
+        this.isOnLive = markerStop.isOnLive;
+        this.isDestinationStop = markerStop.isDestinationStop;
+        this.isDepartureStop = markerStop.isDepartureStop;
+        this.vehicle = markerStop.vehicle;
     }
 
-    public MarkerDataStop(String stopRef, String stopName, Time arrivingTime, Time departureTime) {
+    public MarkerStop(String stopRef, String stopName, Long delay, Time departureTime, int stopOrder, double longitude, double latitude, double distanceTraveled, boolean isDepartureStop, boolean isDestinationStop, MarkerStandardized vehicle) {
         this.stopRef = stopRef;
         this.stopName = stopName;
-        this.arrivalTime = arrivingTime;
         this.departureTime = departureTime;
         this.stopType = StopType.BOTH;
+        this.delay = delay;
+        this.stopOrder = stopOrder;
+        this.distanceTraveled = distanceTraveled;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.isDepartureStop = isDepartureStop;
+        this.isDestinationStop = isDestinationStop;
+        this.vehicle = vehicle;
     }
 
     // ==================== GETTERS ====================
@@ -66,7 +73,7 @@ public class MarkerDataStop {
         return stopName;
     }
 
-    public StopPlatform getPlatform() {
+    public MarkerStopPlatform getPlatform() {
         return platform;
     }
 
@@ -104,7 +111,7 @@ public class MarkerDataStop {
         return longitude;
     }
 
-    public MarkerDataStandardized getVehicle() {
+    public MarkerStandardized getVehicle() {
         return vehicle;
     }
 
@@ -130,7 +137,7 @@ public class MarkerDataStop {
         this.stopName = stopName;
     }
 
-    public void setPlatform(StopPlatform platform) {
+    public void setPlatform(MarkerStopPlatform platform) {
         this.platform = platform;
     }
 
@@ -183,8 +190,8 @@ public class MarkerDataStop {
         this.isDepartureStop = isDepartureStop;
     }
 
-    public void setVehicle(MarkerDataStandardized markerDataStandardized) {
-        this.vehicle = markerDataStandardized;
+    public void setVehicle(MarkerStandardized markerStandardized) {
+        this.vehicle = markerStandardized;
     }
 
     public String getDelayText() {
@@ -238,7 +245,7 @@ public class MarkerDataStop {
     @NonNull
     @Override
     public String toString() {
-        return "MarkerDataStop{" +
+        return "MarkerStop{" +
                 "stopRef='" + stopRef + '\'' +
                 ", stopName='" + stopName + '\'' +
                 ", platformName='" + platform + '\'' +

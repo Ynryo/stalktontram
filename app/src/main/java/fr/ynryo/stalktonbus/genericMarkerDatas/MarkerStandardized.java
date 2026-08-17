@@ -14,7 +14,7 @@ import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleDetails;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleStopDetails;
 import fr.ynryo.stalktonbus.utils.Time;
 
-public class MarkerDataStandardized {
+public class MarkerStandardized {
 
     // ==================== DONNÉES D'IDENTIFICATION ====================
     private MarkerIdentity markerIdentity;
@@ -35,14 +35,14 @@ public class MarkerDataStandardized {
     private boolean detailsLoaded; // Les infos détaillées (stops) ont-ils été fetched?
 
     // ==================== SI TRAIN EN UM ====================
-    private MarkerDataStandardized umA; // Train en UM A
-    private MarkerDataStandardized umB; // Train en UM B
+    private MarkerStandardized umA; // Train en UM A
+    private MarkerStandardized umB; // Train en UM B
 
-    private final static String TAG = "MarkerDataStandardized";
+    private final static String TAG = "MarkerStandardized";
     private final static int NETWORK_ID_SNCF = 17;
 
     // ==================== CONSTRUCTEURS ====================
-    public MarkerDataStandardized() {
+    public MarkerStandardized() {
         this.markerIdentity = new MarkerIdentity();
         this.markerPosition = new MarkerPosition();
         this.markerStyle = new MarkerStyle();
@@ -56,15 +56,15 @@ public class MarkerDataStandardized {
     // ==================== CONVERSION ====================
 
     /**
-     * Converts a {@link BusTrackerMarkerData} object into a {@link MarkerDataStandardized} object with the specified {@link MarkerType}.
+     * Converts a {@link BusTrackerMarkerData} object into a {@link MarkerStandardized} object with the specified {@link MarkerType}.
      *
      * @param busTrackerMarkerData the source {@link BusTrackerMarkerData} object containing the data to be converted
-     * @param type       the {@link MarkerType} to be associated with the resulting {@link MarkerDataStandardized} object
-     * @return a {@link MarkerDataStandardized} object populated with the data from the given {@link BusTrackerMarkerData} and the specified {@link MarkerType
+     * @param type                 the {@link MarkerType} to be associated with the resulting {@link MarkerStandardized} object
+     * @return a {@link MarkerStandardized} object populated with the data from the given {@link BusTrackerMarkerData} and the specified {@link MarkerType
      * }
      */
-    public static MarkerDataStandardized createNewMarkerFrom(@NonNull BusTrackerMarkerData busTrackerMarkerData, @NonNull MarkerType type) {
-        MarkerDataStandardized marker = new MarkerDataStandardized();
+    public static MarkerStandardized createNewMarkerFrom(@NonNull BusTrackerMarkerData busTrackerMarkerData, @NonNull MarkerType type) {
+        MarkerStandardized marker = new MarkerStandardized();
 
         boolean isTrain = (type == MarkerType.TRAIN);
         int lineId = 0;
@@ -104,16 +104,17 @@ public class MarkerDataStandardized {
     }
 
     // à la priorité sur les datas (bus tracker api)
+
     /**
      * Updates the details of the current vehicle instance using the given {@code BusTrackerVehicleDetails} object.
      * Populates various fields such as line ID, destination, network ID, path reference, stops,
      * and additional attributes related to the vehicle's journey and live data.
      *
      * @param busTrackerVehicleDetails A non-null {@link BusTrackerVehicleDetails} object containing details such as line ID,
-     *                    destination, network ID, path reference, and a list of vehicle stops.
-     *                    Each stop may contain information about stop reference, stop name, platform name,
-     *                    expected and aimed times, stop order, coordinates, distance traveled,
-     *                    flags (e.g., NO_PICKUP, NO_DROPOFF), and other related metadata.
+     *                                 destination, network ID, path reference, and a list of vehicle stops.
+     *                                 Each stop may contain information about stop reference, stop name, platform name,
+     *                                 expected and aimed times, stop order, coordinates, distance traveled,
+     *                                 flags (e.g., NO_PICKUP, NO_DROPOFF), and other related metadata.
      */
     public void setVehicleDetails(@NonNull BusTrackerVehicleDetails busTrackerVehicleDetails) {
         this.markerIdentity.setLineId(busTrackerVehicleDetails.getLineId());
@@ -123,43 +124,46 @@ public class MarkerDataStandardized {
         this.markerTrip.setAtStop(busTrackerVehicleDetails.getPosition().isAtStop());
         this.markerTrip.setDistanceTraveled(busTrackerVehicleDetails.getPosition().getDistanceTraveled());
 
-        if (!busTrackerVehicleDetails.getCalls().isEmpty()) {
-            for (int i = 0; i < busTrackerVehicleDetails.getCalls().size(); i++) { //calls = stops
-                BusTrackerVehicleStopDetails busTrackerVehicleStopDetails = busTrackerVehicleDetails.getCalls().get(i);
-                MarkerDataStop stop = new MarkerDataStop();
+        if (busTrackerVehicleDetails.getCalls().isEmpty()) return;
 
-                stop.setStopRef(busTrackerVehicleStopDetails.getStopUIC());
-                stop.setStopName(busTrackerVehicleStopDetails.getStopName());
-                if (busTrackerVehicleStopDetails.getPlatformName() != null) {
-                    stop.setPlatform(
-                            new StopPlatform(busTrackerVehicleStopDetails.getPlatformName(), busTrackerVehicleStopDetails.getStopUIC(), 100)
-                    );
-                }
-                Time aimedTime = Time.parse(busTrackerVehicleStopDetails.getAimedTime());
-                Time expectedTime = Time.parse(busTrackerVehicleStopDetails.getExpectedTime());
-                boolean onLive = expectedTime != null;
+        for (int i = 0; i < busTrackerVehicleDetails.getCalls().size(); i++) { //calls = stops
+            BusTrackerVehicleStopDetails busTrackerVehicleStopDetails = busTrackerVehicleDetails.getCalls().get(i);
 
-                stop.setOnLive(onLive);
-                stop.setDelay(Time.calculateDelayMinutes(aimedTime, expectedTime));
-                stop.setDepartureTime(onLive ? expectedTime : aimedTime);
-                stop.setStopOrder(busTrackerVehicleStopDetails.getStopOrder());
-                stop.setLongitude(busTrackerVehicleStopDetails.getLongitude());
-                stop.setLatitude(busTrackerVehicleStopDetails.getLatitude());
-                stop.setDistanceTraveled(busTrackerVehicleStopDetails.getDistanceTraveled());
-                stop.setIsDepartureStop(busTrackerVehicleStopDetails.getDistanceTraveled() == 0);
-                stop.setIsDestinationStop(i == busTrackerVehicleDetails.getCalls().size() - 1);
-                stop.setVehicle(this);
+            Time aimedTime = Time.parse(busTrackerVehicleStopDetails.getAimedTime());
+            Time expectedTime = Time.parse(busTrackerVehicleStopDetails.getExpectedTime());
+            boolean onLive = expectedTime != null;
 
-                if (busTrackerVehicleStopDetails.getFlags().contains("NO_PICKUP")) {
-                    stop.setStopType(StopType.NO_PICKUP);
-                } else if (busTrackerVehicleStopDetails.getFlags().contains("NO_DROPOFF")) {
-                    stop.setStopType(StopType.NO_DROPOFF);
-                } else {
-                    stop.setStopType(StopType.BOTH);
-                }
+            MarkerStop stop = new MarkerStop(
+                    busTrackerVehicleStopDetails.getStopUIC(),
+                    busTrackerVehicleStopDetails.getStopName(),
+                    Time.calculateDelayMinutes(aimedTime, expectedTime),
+                    onLive ? expectedTime : aimedTime,
+                    busTrackerVehicleStopDetails.getStopOrder(),
+                    busTrackerVehicleStopDetails.getLongitude(),
+                    busTrackerVehicleStopDetails.getLatitude(),
+                    busTrackerVehicleStopDetails.getDistanceTraveled(),
+                    busTrackerVehicleStopDetails.getDistanceTraveled() == 0,
+                    i == busTrackerVehicleDetails.getCalls().size() - 1,
+                    this
+            );
 
-                this.markerTrip.getStops().add(stop);
+            if (busTrackerVehicleStopDetails.getPlatformName() != null) {
+                stop.setPlatform(
+                        new MarkerStopPlatform(busTrackerVehicleStopDetails.getPlatformName(), busTrackerVehicleStopDetails.getStopUIC(), 100)
+                );
             }
+
+            stop.setOnLive(onLive);
+
+            if (busTrackerVehicleStopDetails.getFlags().contains("NO_PICKUP")) {
+                stop.setStopType(StopType.NO_PICKUP);
+            } else if (busTrackerVehicleStopDetails.getFlags().contains("NO_DROPOFF")) {
+                stop.setStopType(StopType.NO_DROPOFF);
+            } else {
+                stop.setStopType(StopType.BOTH);
+            }
+
+            this.markerTrip.getStops().add(stop);
         }
 
         this.detailsLoaded = true;
@@ -171,13 +175,13 @@ public class MarkerDataStandardized {
 
         // CartoTchooGuessPlatform bestGuessPlatform = guessPlatforms.get(0);
         CartoTchooGuessPlatform bestGuessPlatform = Collections.max(guessPlatforms, Comparator.comparingDouble(CartoTchooGuessPlatform::getPercentage));
-        for (MarkerDataStop markerDataStop : this.markerTrip.getStops()) {
-            if (uicCode.equals(markerDataStop.getStopRef())) {
+        for (MarkerStop markerStop : this.markerTrip.getStops()) {
+            if (uicCode.equals(markerStop.getStopRef())) {
                 // secu pour éviter d'écraser un quai officiel à 100% par un guess platform
-                if (markerDataStop.getPlatform() != null && markerDataStop.getPlatform().getPercentage() == 100) {
+                if (markerStop.getPlatform() != null && markerStop.getPlatform().getPercentage() == 100) {
                     break;
                 }
-                markerDataStop.setPlatform(new StopPlatform(
+                markerStop.setPlatform(new MarkerStopPlatform(
                         bestGuessPlatform.getPlatform(),
                         uicCode,
                         bestGuessPlatform.getPercentage()));
@@ -238,7 +242,7 @@ public class MarkerDataStandardized {
         return markerTrip.getDestination();
     }
 
-    public List<MarkerDataStop> getStops() {
+    public List<MarkerStop> getStops() {
         return markerTrip.getStops() != null ? markerTrip.getStops() : new ArrayList<>();
     }
 
@@ -274,11 +278,11 @@ public class MarkerDataStandardized {
         return detailsLoaded;
     }
 
-    public MarkerDataStandardized getUmA() {
+    public MarkerStandardized getUmA() {
         return umA;
     }
 
-    public MarkerDataStandardized getUmB() {
+    public MarkerStandardized getUmB() {
         return umB;
     }
 
@@ -407,10 +411,10 @@ public class MarkerDataStandardized {
      * based on the presence of valid stop data.
      *
      * @param stops The list of stops to associate with the marker. Each stop is represented
-     *              by a MarkerDataStop object. Passing a null or empty list will mark the
+     *              by a MarkerStop object. Passing a null or empty list will mark the
      *              details as not loaded.
      */
-    public void setStops(List<MarkerDataStop> stops) {
+    public void setStops(List<MarkerStop> stops) {
         this.markerTrip.setStops(stops);
         this.detailsLoaded = (stops != null && !stops.isEmpty());
     }
@@ -472,32 +476,32 @@ public class MarkerDataStandardized {
     /**
      * Sets the first unit of a standardized marker forming a multiple-unit train (UM - Unité Multiple).
      *
-     * @param umA The first unit of the train. It is represented as a MarkerDataStandardized object
+     * @param umA The first unit of the train. It is represented as a MarkerStandardized object
      *            and encapsulates standardized data associated with the unit.
      */
-    public void setUmA(MarkerDataStandardized umA) {
+    public void setUmA(MarkerStandardized umA) {
         this.umA = umA;
     }
 
     /**
      * Sets the second unit of a standardized marker forming a multiple-unit train (UM - Unité Multiple).
      *
-     * @param umB The second unit of the train. It is represented as a MarkerDataStandardized object
+     * @param umB The second unit of the train. It is represented as a MarkerStandardized object
      *            and encapsulates standardized data associated with the unit.
      */
-    public void setUmB(MarkerDataStandardized umB) {
+    public void setUmB(MarkerStandardized umB) {
         this.umB = umB;
     }
 
     /**
      * Sets a pair of standardized marker units forming a multiple-unit train (UM - Unité Multiple).
      *
-     * @param umA The first unit of the train. It is represented as a MarkerDataStandardized object
+     * @param umA The first unit of the train. It is represented as a MarkerStandardized object
      *            and encapsulates standardized data associated with the unit.
-     * @param umB The second unit of the train. It is represented as a MarkerDataStandardized object
+     * @param umB The second unit of the train. It is represented as a MarkerStandardized object
      *            and encapsulates standardized data associated with the unit.
      */
-    public void setUmPair(MarkerDataStandardized umA, MarkerDataStandardized umB) {
+    public void setUmPair(MarkerStandardized umA, MarkerStandardized umB) {
         this.setUmA(umA);
         this.setUmB(umB);
     }
@@ -536,12 +540,12 @@ public class MarkerDataStandardized {
     /**
      * Retrieves the next stop in the list of stops, if available.
      *
-     * @return the next stop as a {@code MarkerDataStop} object if the stops list is not null or empty;
+     * @return the next stop as a {@code MarkerStop} object if the stops list is not null or empty;
      * otherwise, returns {@code null}.
      */
     @Nullable
-    public MarkerDataStop getNextStop() {
-        List<MarkerDataStop> stops = getStops();
+    public MarkerStop getNextStop() {
+        List<MarkerStop> stops = getStops();
         if (stops != null && !stops.isEmpty()) {
             return stops.get(0);
         }
@@ -554,7 +558,7 @@ public class MarkerDataStandardized {
      * @return the count of remaining stops, or 0 if the stops list is null.
      */
     public int getRemainingStopsCount() {
-        List<MarkerDataStop> stops = getStops();
+        List<MarkerStop> stops = getStops();
         return stops != null ? stops.size() : 0;
     }
 
@@ -575,7 +579,7 @@ public class MarkerDataStandardized {
     @NonNull
     @Override
     public String toString() {
-        return "MarkerDataStandardized{" +
+        return "MarkerStandardized{" +
                 "markerIdentity=" + markerIdentity +
                 ", markerStyle=" + markerStyle +
                 ", markerPosition=" + markerPosition +

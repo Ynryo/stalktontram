@@ -32,7 +32,7 @@ import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.version.YnryoVersionResponse;
 import fr.ynryo.stalktonbus.artists.MarkerArtist;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.managers.CompassManager;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
 import fr.ynryo.stalktonbus.managers.FollowManager;
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void centerOnMarker(String markerId, boolean isTilted, boolean isRotated) {
         Marker marker = markerArtist.getActiveMarkers().get(markerId);
         if (marker != null && googleMap != null) {
-            MarkerDataStandardized data = (MarkerDataStandardized) marker.getTag();
+            MarkerStandardized data = (MarkerStandardized) marker.getTag();
             float bearing = data != null ? data.getBearing() : 0f;
 
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
@@ -290,12 +290,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //TODO: refactor
-    public void centerOnMarker(MarkerDataStandardized markerDataStandardized, boolean isTilted, boolean isRotated) {
-        float bearing = markerDataStandardized != null ? markerDataStandardized.getBearing() : 0f;
+    public void centerOnMarker(MarkerStandardized markerStandardized, boolean isTilted, boolean isRotated) {
+        float bearing = markerStandardized != null ? markerStandardized.getBearing() : 0f;
 
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                 new CameraPosition.Builder()
-                        .target(new LatLng(markerDataStandardized.getLatitude(), markerDataStandardized.getLongitude()))
+                        .target(new LatLng(markerStandardized.getLatitude(), markerStandardized.getLongitude()))
                         .bearing(isRotated ? bearing : 0)
                         .tilt(isTilted ? 60f : 0f)
                         .zoom(17f)
@@ -309,9 +309,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         fetcher.fetchMarkers(new FetchingManager.OnMarkersListener() {
             @Override
-            public void onResponseMarkersListener(List<MarkerDataStandardized> markerDataStandardizedList) {
+            public void onResponseMarkersListener(List<MarkerStandardized> markerStandardizedList) {
                 isFetching = false;
-                markerArtist.showMarkers(markerDataStandardizedList);
+                markerArtist.showMarkers(markerStandardizedList);
                 if (markerArtist.getMarkerIconCache().size() > 200)
                     markerArtist.getMarkerIconCache().clear();
             }

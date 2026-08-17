@@ -7,17 +7,17 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkerData;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerType;
 
-public class BusTrackerMarkerDataStandardizedTest {
+public class BusTrackerMarkerStandardizedTest {
 
     @Test
     public void testCreateNewMarkerFromWithNullOrEmptyFieldsDoesNotThrow() {
         BusTrackerMarkerData busTrackerMarkerData = new BusTrackerMarkerData();
         MarkerType type = MarkerType.guestFromMarkerId(busTrackerMarkerData.getId());
 
-        MarkerDataStandardized standardized = MarkerDataStandardized.createNewMarkerFrom(busTrackerMarkerData, type);
+        MarkerStandardized standardized = MarkerStandardized.createNewMarkerFrom(busTrackerMarkerData, type);
         assertNotNull(standardized);
         assertNull(standardized.getId());
         assertNull(standardized.getLineNumber());
@@ -26,7 +26,7 @@ public class BusTrackerMarkerDataStandardizedTest {
 
     @Test
     public void testDefaultConstructorDoesNotThrowOnGettersAndSetters() {
-        MarkerDataStandardized marker = new MarkerDataStandardized();
+        MarkerStandardized marker = new MarkerStandardized();
         assertNotNull(marker.getId());
         assertEquals(0.0, marker.getLatitude(), 0.0001);
         assertEquals(0.0, marker.getLongitude(), 0.0001);

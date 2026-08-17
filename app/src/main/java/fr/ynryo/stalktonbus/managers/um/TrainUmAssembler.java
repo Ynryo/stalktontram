@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStop;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStop;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerType;
 import fr.ynryo.stalktonbus.utils.Time;
 
@@ -14,15 +14,15 @@ public class TrainUmAssembler {
     private final static String TAG = "TrainUmAssembler";
 
     /**
-     * Builds a unified marker by combining data from two MarkerDataStandardized instances.
+     * Builds a unified marker by combining data from two MarkerStandardized instances.
      * The unified marker includes a composite ID, average location, and combined metadata.
      *
-     * @param trainA the first MarkerDataStandardized instance to be merged
-     * @param trainB the second MarkerDataStandardized instance to be merged
-     * @return a MarkerDataStandardized instance representing the unified marker created from the input instances
+     * @param trainA the first MarkerStandardized instance to be merged
+     * @param trainB the second MarkerStandardized instance to be merged
+     * @return a MarkerStandardized instance representing the unified marker created from the input instances
      */
-    public static MarkerDataStandardized buildUmMarker(MarkerDataStandardized trainA, MarkerDataStandardized trainB) {
-        MarkerDataStandardized um = new MarkerDataStandardized();
+    public static MarkerStandardized buildUmMarker(MarkerStandardized trainA, MarkerStandardized trainB) {
+        MarkerStandardized um = new MarkerStandardized();
         String idA = trainA.getId();
         String idB = trainB.getId();
         um.setId(idA.compareTo(idB) <= 0 ? idA + "+" + idB : idB + "+" + idA);
@@ -43,35 +43,35 @@ public class TrainUmAssembler {
 
     /**
      * Assembles a list of timeline rows representing stops for a unified marker (UM),
-     * combining and aligning stops from two associated MarkerDataStandardized instances.
+     * combining and aligning stops from two associated MarkerStandardized instances.
      *
-     * @param um the unified marker containing two associated MarkerDataStandardized instances, which
+     * @param um the unified marker containing two associated MarkerStandardized instances, which
      *           represent two trains combined as a UM. The method uses these instances to retrieve and
      *           align their respective stop data.
      * @return a list of TrainUmTimelineRow objects, where each row represents either a common stop,
      *         a split stop (distinct stops from the two trains), or an aligned stop based on calculated
      *         chronological order.
      */
-    public static List<TrainUmTimelineRow> assembleUmStops(MarkerDataStandardized um) {
+    public static List<TrainUmTimelineRow> assembleUmStops(MarkerStandardized um) {
         List<TrainUmTimelineRow> displayRows = new ArrayList<>();
 
         if (!um.isUm()) {
             return displayRows;
         }
 
-        MarkerDataStandardized trainA = um.getUmA();
-        MarkerDataStandardized trainB = um.getUmB();
+        MarkerStandardized trainA = um.getUmA();
+        MarkerStandardized trainB = um.getUmB();
 
-        List<MarkerDataStop> stopsA = trainA.getStops() != null ? trainA.getStops() : new ArrayList<>();
-        List<MarkerDataStop> stopsB = trainB.getStops() != null ? trainB.getStops() : new ArrayList<>();
+        List<MarkerStop> stopsA = trainA.getStops() != null ? trainA.getStops() : new ArrayList<>();
+        List<MarkerStop> stopsB = trainB.getStops() != null ? trainB.getStops() : new ArrayList<>();
 
         if (stopsA.isEmpty() && stopsB.isEmpty()) return displayRows;
 
         // 1. Trouver les références des arrêts communs
         List<String> commonRefs = new ArrayList<>();
         Set<String> bRefs = new HashSet<>();
-        for (MarkerDataStop b : stopsB) bRefs.add(b.getStopRef());
-        for (MarkerDataStop a : stopsA) {
+        for (MarkerStop b : stopsB) bRefs.add(b.getStopRef());
+        for (MarkerStop a : stopsA) {
             if (bRefs.contains(a.getStopRef())) commonRefs.add(a.getStopRef());
         }
 
@@ -110,11 +110,11 @@ public class TrainUmAssembler {
 
         while (indexA < endPhase2A && indexB < endPhase2B) {
             // On vérifie que c'est bien le même arrêt physiquement
-            MarkerDataStop stopA = stopsA.get(indexA);
-            MarkerDataStop stopB = stopsB.get(indexB);
+            MarkerStop stopA = stopsA.get(indexA);
+            MarkerStop stopB = stopsB.get(indexB);
 
             if (stopA.getStopRef().equals(stopB.getStopRef())) {
-                MarkerDataStop commonStop = new MarkerDataStop(stopA);
+                MarkerStop commonStop = new MarkerStop(stopA);
                 commonStop.setVehicle(um); // Appartient à l'UM global
 
                 // Vérifier si les horaires divergent même s'ils sont dans la phase commune (séparation au départ du quai)
@@ -169,7 +169,7 @@ public class TrainUmAssembler {
     /**
      * Fonction utilitaire pour trouver l'index d'un arrêt dans une liste.
      */
-    private static int findStopIndex(List<MarkerDataStop> stops, String stopRef) {
+    private static int findStopIndex(List<MarkerStop> stops, String stopRef) {
         for (int i = 0; i < stops.size(); i++) {
             if (stops.get(i).getStopRef().equals(stopRef)) return i;
         }
@@ -179,21 +179,21 @@ public class TrainUmAssembler {
     /**
      * Aligne côte à côte les arrêts exclusifs de deux listes.
      */
-    private static void zipStopsSideBySide(List<MarkerDataStop> stopsA, List<MarkerDataStop> stopsB,
+    private static void zipStopsSideBySide(List<MarkerStop> stopsA, List<MarkerStop> stopsB,
                                            int startA, int endA, int startB, int endB,
                                            List<TrainUmTimelineRow> displayRows) {
         int i = startA;
         int j = startB;
         while (i < endA || j < endB) {
-            MarkerDataStop stopA = (i < endA) ? stopsA.get(i) : null;
-            MarkerDataStop stopB = (j < endB) ? stopsB.get(j) : null;
+            MarkerStop stopA = (i < endA) ? stopsA.get(i) : null;
+            MarkerStop stopB = (j < endB) ? stopsB.get(j) : null;
             displayRows.add(TrainUmTimelineRow.createSideBySideStop(stopA, stopB));
             if (i < endA) i++;
             if (j < endB) j++;
         }
     }
 
-    public static String getDestination(MarkerDataStandardized um) {
+    public static String getDestination(MarkerStandardized um) {
         if (!um.isUm()) return um.getDestination();
 
         String destA = um.getUmA().getDestination();

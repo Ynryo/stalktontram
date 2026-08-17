@@ -37,7 +37,7 @@ import fr.ynryo.stalktonbus.LateralDrawerActivity;
 import fr.ynryo.stalktonbus.MainActivity;
 import fr.ynryo.stalktonbus.MarkerStopsDetailActivity;
 import fr.ynryo.stalktonbus.R;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
 import fr.ynryo.stalktonbus.managers.FollowManager;
 import fr.ynryo.stalktonbus.managers.um.TrainUmDetector;
@@ -76,16 +76,16 @@ public class MarkerArtist {
     /**
      * Affiche les markers sur la carte
      *
-     * @param markerDataStandardizedList List<MarkerDataStandardized>
+     * @param markerStandardizedList List<MarkerStandardized>
      */
-    public void showMarkers(List<MarkerDataStandardized> markerDataStandardizedList) {
-        if (googleMap == null || markerDataStandardizedList == null) return;
+    public void showMarkers(List<MarkerStandardized> markerStandardizedList) {
+        if (googleMap == null || markerStandardizedList == null) return;
 
-        List<MarkerDataStandardized> displayList = TrainUmDetector.filterUm(markerDataStandardizedList);
+        List<MarkerStandardized> displayList = TrainUmDetector.filterUm(markerStandardizedList);
 
         Set<String> fetchedMarkerIds = new HashSet<>();
-        for (MarkerDataStandardized fetchedMarkerDataStandardized : displayList) { //on met tout les markers dans une liste
-            fetchedMarkerIds.add(fetchedMarkerDataStandardized.getId());
+        for (MarkerStandardized fetchedMarkerStandardized : displayList) { //on met tout les markers dans une liste
+            fetchedMarkerIds.add(fetchedMarkerStandardized.getId());
         }
 
         //on nettoie les marker qui sont plus dans le fetch
@@ -107,11 +107,11 @@ public class MarkerArtist {
         }
 
         //traitement des markers fetch
-        for (MarkerDataStandardized fetchedMarkerDataStandardized : displayList) {
-            String id = fetchedMarkerDataStandardized.getId();
+        for (MarkerStandardized fetchedMarkerStandardized : displayList) {
+            String id = fetchedMarkerStandardized.getId();
 
             //on check par rapport au filtre réseau
-            if (!lateralDrawerActivity.isNetworkVisible(fetchedMarkerDataStandardized.getNetworkRef())) {
+            if (!lateralDrawerActivity.isNetworkVisible(fetchedMarkerStandardized.getNetworkRef())) {
                 if (activeMarkers.containsKey(id)) {
                     // Filtré : on retire de l'affichage mais on garde follow/polyline car il existe
                     activeMarkers.get(id).remove();
@@ -122,25 +122,25 @@ public class MarkerArtist {
             }
 
             float mapRotation = googleMap.getCameraPosition().bearing;
-            LatLng position = new LatLng(fetchedMarkerDataStandardized.getLatitude(), fetchedMarkerDataStandardized.getLongitude());
+            LatLng position = new LatLng(fetchedMarkerStandardized.getLatitude(), fetchedMarkerStandardized.getLongitude());
 
             if (activeMarkers.containsKey(id)) {
                 Marker existingMarker = activeMarkers.get(id);
                 if (existingMarker != null) {
                     animateMarker(existingMarker, position, followManager.isFollowing(id));
 
-                    MarkerDataStandardized oldData = (MarkerDataStandardized) existingMarker.getTag();
-                    if (oldData == null || !Objects.equals(oldData.getFillColor(), fetchedMarkerDataStandardized.getFillColor()) || !Objects.equals(oldData.getLineId(), fetchedMarkerDataStandardized.getLineId()) || Math.abs(oldData.getBearing() - fetchedMarkerDataStandardized.getBearing()) > 5) {
-                        existingMarker.setIcon(createMarkerBitmapDescriptor(fetchedMarkerDataStandardized, mapRotation, followManager.isFollowing(id)));
+                    MarkerStandardized oldData = (MarkerStandardized) existingMarker.getTag();
+                    if (oldData == null || !Objects.equals(oldData.getFillColor(), fetchedMarkerStandardized.getFillColor()) || !Objects.equals(oldData.getLineId(), fetchedMarkerStandardized.getLineId()) || Math.abs(oldData.getBearing() - fetchedMarkerStandardized.getBearing()) > 5) {
+                        existingMarker.setIcon(createMarkerBitmapDescriptor(fetchedMarkerStandardized, mapRotation, followManager.isFollowing(id)));
                     }
 
-                    existingMarker.setTag(fetchedMarkerDataStandardized);
+                    existingMarker.setTag(fetchedMarkerStandardized);
                 }
             } else {
-                Marker newMarker = googleMap.addMarker(new MarkerOptions().position(position).icon(createMarkerBitmapDescriptor(fetchedMarkerDataStandardized, mapRotation, followManager.isFollowing(id))).anchor(0.5f, 0.3f));
+                Marker newMarker = googleMap.addMarker(new MarkerOptions().position(position).icon(createMarkerBitmapDescriptor(fetchedMarkerStandardized, mapRotation, followManager.isFollowing(id))).anchor(0.5f, 0.3f));
 
                 if (newMarker != null) {
-                    newMarker.setTag(fetchedMarkerDataStandardized);
+                    newMarker.setTag(fetchedMarkerStandardized);
                     activeMarkers.put(id, newMarker);
                 }
             }
@@ -168,13 +168,13 @@ public class MarkerArtist {
         });
     }
 
-    public Bitmap createMarker(MarkerDataStandardized markerDataStandardized, float mapRotation, boolean shouldFollow) {
+    public Bitmap createMarker(MarkerStandardized markerStandardized, float mapRotation, boolean shouldFollow) {
         ImageView markerCircle = cachedMarkerView.findViewById(R.id.marker_circle);
         TextView lineNumberView = cachedMarkerView.findViewById(R.id.line_number);
 
-        int fillColor = Color.parseColor(markerDataStandardized.getFillColor() != null ? markerDataStandardized.getFillColor() : "#424242");
-        int textColor = Color.parseColor(markerDataStandardized.getTextColor() != null ? markerDataStandardized.getTextColor() : "#FFFFFF");
-        float bearing = markerDataStandardized.getBearing();
+        int fillColor = Color.parseColor(markerStandardized.getFillColor() != null ? markerStandardized.getFillColor() : "#424242");
+        int textColor = Color.parseColor(markerStandardized.getTextColor() != null ? markerStandardized.getTextColor() : "#FFFFFF");
+        float bearing = markerStandardized.getBearing();
 
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.marker_circle);
         if (drawable != null) {
@@ -190,7 +190,7 @@ public class MarkerArtist {
             markerCircle.setImageDrawable(layerDrawable);
         }
 
-        lineNumberView.setText(markerDataStandardized.getLineNumber() != null ? markerDataStandardized.getLineNumber() : "BD");
+        lineNumberView.setText(markerStandardized.getLineNumber() != null ? markerStandardized.getLineNumber() : "BD");
         lineNumberView.setTextColor(textColor);
 
         GradientDrawable gd = new GradientDrawable();
@@ -211,13 +211,13 @@ public class MarkerArtist {
         return bitmap;
     }
 
-    public Bitmap createUmMarker(MarkerDataStandardized markerDataStandardized, float mapRotation, boolean shouldFollow) {
+    public Bitmap createUmMarker(MarkerStandardized markerStandardized, float mapRotation, boolean shouldFollow) {
         ImageView markerCircleUm = cachedUmMarkerView.findViewById(R.id.marker_circle_um);
         TextView lineNumberView = cachedUmMarkerView.findViewById(R.id.line_number);
 
-        int fillColor = Color.parseColor(markerDataStandardized.getFillColor() != null ? markerDataStandardized.getFillColor() : "#424242");
-        int textColor = Color.parseColor(markerDataStandardized.getTextColor() != null ? markerDataStandardized.getTextColor() : "#FFFFFF");
-        float bearing = markerDataStandardized.getBearing();
+        int fillColor = Color.parseColor(markerStandardized.getFillColor() != null ? markerStandardized.getFillColor() : "#424242");
+        int textColor = Color.parseColor(markerStandardized.getTextColor() != null ? markerStandardized.getTextColor() : "#FFFFFF");
+        float bearing = markerStandardized.getBearing();
 
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.marker_circle_um);
         if (drawable != null) {
@@ -233,7 +233,7 @@ public class MarkerArtist {
             markerCircleUm.setImageDrawable(layerDrawable);
         }
 
-        lineNumberView.setText(markerDataStandardized.getLineNumber() != null ? markerDataStandardized.getLineNumber() : "BD");
+        lineNumberView.setText(markerStandardized.getLineNumber() != null ? markerStandardized.getLineNumber() : "BD");
         lineNumberView.setTextColor(textColor);
 
         GradientDrawable gd = new GradientDrawable();
@@ -255,23 +255,23 @@ public class MarkerArtist {
     }
 
 
-    public BitmapDescriptor createMarkerBitmapDescriptor(MarkerDataStandardized markerDataStandardized, float mapRotation, boolean shouldFollow) {
-        String cacheKey = (markerDataStandardized.isUm() ? "UM_" : "US_")
-                + markerDataStandardized.getFillColor() + "_"
-                + markerDataStandardized.getLineId() + "_"
-                + (int) (markerDataStandardized.getBearing() - mapRotation) + "_"
-                + markerDataStandardized.getId();
-//        Log.d(TAG, "cacheKey=" + cacheKey + " isUm=" + markerDataStandardized.isUm() + " cacheHit=" + markerIconCache.containsKey(cacheKey));
+    public BitmapDescriptor createMarkerBitmapDescriptor(MarkerStandardized markerStandardized, float mapRotation, boolean shouldFollow) {
+        String cacheKey = (markerStandardized.isUm() ? "UM_" : "US_")
+                + markerStandardized.getFillColor() + "_"
+                + markerStandardized.getLineId() + "_"
+                + (int) (markerStandardized.getBearing() - mapRotation) + "_"
+                + markerStandardized.getId();
+//        Log.d(TAG, "cacheKey=" + cacheKey + " isUm=" + markerStandardized.isUm() + " cacheHit=" + markerIconCache.containsKey(cacheKey));
 
         if (markerIconCache.containsKey(cacheKey)) {
             return markerIconCache.get(cacheKey);
         }
 
         Bitmap bitmap;
-        if (markerDataStandardized.isUm()) {
-            bitmap = createUmMarker(markerDataStandardized, mapRotation, shouldFollow);
+        if (markerStandardized.isUm()) {
+            bitmap = createUmMarker(markerStandardized, mapRotation, shouldFollow);
         } else {
-            bitmap = createMarker(markerDataStandardized, mapRotation, shouldFollow);
+            bitmap = createMarker(markerStandardized, mapRotation, shouldFollow);
         }
 
         BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
@@ -289,7 +289,7 @@ public class MarkerArtist {
 
         for (Map.Entry<String, Marker> entry : activeMarkers.entrySet()) {
             Marker marker = entry.getValue();
-            MarkerDataStandardized data = (MarkerDataStandardized) marker.getTag();
+            MarkerStandardized data = (MarkerStandardized) marker.getTag();
             if (data != null) {
                 marker.setIcon(createMarkerBitmapDescriptor(data, mapRotation, followManager.isFollowing(data.getId())));
             }
@@ -297,7 +297,7 @@ public class MarkerArtist {
     }
 
     public void onMarkerClick(@NonNull Marker marker) {
-        MarkerDataStandardized mData = (MarkerDataStandardized) marker.getTag();
+        MarkerStandardized mData = (MarkerStandardized) marker.getTag();
         if (mData != null) {
             markerStopsDetailActivity.open(mData);
         }
@@ -305,7 +305,7 @@ public class MarkerArtist {
 
     public void animateMarker(final Marker marker, final LatLng toPosition, boolean shouldFollow) {
         final LatLng startPosition = marker.getPosition();
-        String markerId = marker.getTag() != null ? ((MarkerDataStandardized) marker.getTag()).getId() : "";
+        String markerId = marker.getTag() != null ? ((MarkerStandardized) marker.getTag()).getId() : "";
 
         ValueAnimator existing = activeAnimators.get(markerId);
         if (existing != null && existing.isRunning()) {
@@ -313,7 +313,7 @@ public class MarkerArtist {
         }
 
         if (shouldFollow && googleMap != null) {
-            MarkerDataStandardized data = (MarkerDataStandardized) marker.getTag();
+            MarkerStandardized data = (MarkerStandardized) marker.getTag();
             float bearing = data != null ? data.getBearing() : 0f;
 
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(toPosition).bearing(bearing).tilt(60f).zoom(17f).build()), 2000, null);

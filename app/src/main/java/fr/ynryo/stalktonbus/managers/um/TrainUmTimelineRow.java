@@ -1,15 +1,15 @@
 package fr.ynryo.stalktonbus.managers.um;
 
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStop;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStop;
 
 public class TrainUmTimelineRow {
     private TimelineRowType type;
-    private MarkerDataStop stopA; // Utilisé comme arrêt commun si type == COMMON
-    private MarkerDataStop stopB;
+    private MarkerStop stopA; // Utilisé comme arrêt commun si type == COMMON
+    private MarkerStop stopB;
     private boolean isFirstPosition = false;
     private boolean isLastPosition = false;
 
-    private TrainUmTimelineRow(TimelineRowType type, MarkerDataStop stopA, MarkerDataStop stopB, boolean isFirstPosition, boolean isLastPosition) {
+    private TrainUmTimelineRow(TimelineRowType type, MarkerStop stopA, MarkerStop stopB, boolean isFirstPosition, boolean isLastPosition) {
         this.type = type;
         this.stopA = stopA;
         this.stopB = stopB;
@@ -17,11 +17,11 @@ public class TrainUmTimelineRow {
         this.isLastPosition = isLastPosition;
     }
 
-    public static TrainUmTimelineRow createCommonStop(MarkerDataStop stop) {
+    public static TrainUmTimelineRow createCommonStop(MarkerStop stop) {
         return new TrainUmTimelineRow(TimelineRowType.COMMON, stop, null, false, false);
     }
 
-    public static TrainUmTimelineRow createSideBySideStop(MarkerDataStop stopA, MarkerDataStop stopB) {
+    public static TrainUmTimelineRow createSideBySideStop(MarkerStop stopA, MarkerStop stopB) {
         return new TrainUmTimelineRow(TimelineRowType.SIDE_BY_SIDE, stopA, stopB, false, false);
     }
 
@@ -33,11 +33,11 @@ public class TrainUmTimelineRow {
         return new TrainUmTimelineRow(TimelineRowType.SPLIT_GRAPHIC, null, null, false, false);
     }
 
-    public MarkerDataStop getStopA() {
+    public MarkerStop getStopA() {
         return stopA;
     }
 
-    public MarkerDataStop getStopB() {
+    public MarkerStop getStopB() {
         return stopB;
     }
 

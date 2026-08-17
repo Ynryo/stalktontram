@@ -20,7 +20,7 @@ import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleDetails;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.version.YnryoVersionResponse;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerType;
 import fr.ynryo.stalktonbus.managers.um.TrainUmAssembler;
 import retrofit2.Call;
@@ -30,7 +30,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Classe gérant les requêtes et réponses de l'API et les conversions avec MarkerDataStandardized
+ * Classe gérant les requêtes et réponses de l'API et les conversions avec MarkerStandardized
  *
  * Author: Ynryo
  */
@@ -65,13 +65,13 @@ public class FetchingManager {
 
     // ==================== LISTENERS ====================
     public interface OnMarkersListener {
-        void onResponseMarkersListener(List<MarkerDataStandardized> markerDataStandardizedList);
+        void onResponseMarkersListener(List<MarkerStandardized> markerStandardizedList);
 
         void onErrorMarkersListener(String error);
     }
 
     public interface OnVehicleDetailsListener {
-        void onResponseVehicleDetailsListener(MarkerDataStandardized markerDataStandardized);
+        void onResponseVehicleDetailsListener(MarkerStandardized markerStandardized);
 
         void onErrorVehicleDetailsListener(String error);
     }
@@ -83,7 +83,7 @@ public class FetchingManager {
     }
 
     public interface OnRouteLineListener {
-        void onResponseRouteLineListener(MarkerDataStandardized data);
+        void onResponseRouteLineListener(MarkerStandardized data);
 
         void onErrorRouteLineListener(String error);
     }
@@ -147,8 +147,8 @@ public class FetchingManager {
             @Override
             public void onResponse(@NonNull Call<BusTrackerMarkersList> call, @NonNull Response<BusTrackerMarkersList> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Convertir BusTrackerMarkerData en MarkerDataStandardized
-                    List<MarkerDataStandardized> standardizedMarkers = convertMarkerDataList(response.body().getItems());
+                    // Convertir BusTrackerMarkerData en MarkerStandardized
+                    List<MarkerStandardized> standardizedMarkers = convertMarkerDataList(response.body().getItems());
                     listener.onResponseMarkersListener(standardizedMarkers);
                 } else {
                     listener.onErrorMarkersListener("Erreur réponse: " + response.code());
@@ -163,18 +163,18 @@ public class FetchingManager {
     }
 
     // ==================== FETCH VEHICLE DETAILS ====================
-    public void fetchVehicleStopsInfo(MarkerDataStandardized markerDataStandardized, OnVehicleDetailsListener listener) {
+    public void fetchVehicleStopsInfo(MarkerStandardized markerStandardized, OnVehicleDetailsListener listener) {
         try {
-            if (markerDataStandardized.isUm()) {
+            if (markerStandardized.isUm()) {
                 OnVehicleDetailsListener umListener = new OnVehicleDetailsListener() {
                     private int responsesReceived = 0;
 
                     @Override
-                    public void onResponseVehicleDetailsListener(MarkerDataStandardized data) {
+                    public void onResponseVehicleDetailsListener(MarkerStandardized data) {
                         responsesReceived++;
                         if (responsesReceived == 2) {
-                            TrainUmAssembler.assembleUmStops(markerDataStandardized);
-                            listener.onResponseVehicleDetailsListener(markerDataStandardized);
+                            TrainUmAssembler.assembleUmStops(markerStandardized);
+                            listener.onResponseVehicleDetailsListener(markerStandardized);
                         }
                     }
 
@@ -183,20 +183,20 @@ public class FetchingManager {
                         listener.onErrorVehicleDetailsListener(error);
                     }
                 };
-                fetchVehicleStopsInfo(markerDataStandardized.getUmA(), umListener);
-                fetchVehicleStopsInfo(markerDataStandardized.getUmB(), umListener);
+                fetchVehicleStopsInfo(markerStandardized.getUmA(), umListener);
+                fetchVehicleStopsInfo(markerStandardized.getUmB(), umListener);
                 return;
             }
 
-            String encodedId = URLEncoder.encode(markerDataStandardized.getId(), "UTF-8");
+            String encodedId = URLEncoder.encode(markerStandardized.getId(), "UTF-8");
             getService(BASE_URL_BUS_TRACKER).getVehicleDetails(encodedId).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<BusTrackerVehicleDetails> call, @NonNull Response<BusTrackerVehicleDetails> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         BusTrackerVehicleDetails vehicleData = response.body();
-                        markerDataStandardized.setVehicleDetails(vehicleData);
-                        Log.d(TAG, String.valueOf(markerDataStandardized));
-                        listener.onResponseVehicleDetailsListener(markerDataStandardized);
+                        markerStandardized.setVehicleDetails(vehicleData);
+                        Log.d(TAG, String.valueOf(markerStandardized));
+                        listener.onResponseVehicleDetailsListener(markerStandardized);
                     } else {
                         listener.onErrorVehicleDetailsListener(String.valueOf(response.code()));
                     }
@@ -233,17 +233,17 @@ public class FetchingManager {
     }
 
     // ==================== FETCH ROUTE LINE ====================
-    public void fetchBusLine(MarkerDataStandardized markerDataStandardized, OnRouteLineListener listener) {
+    public void fetchBusLine(MarkerStandardized markerStandardized, OnRouteLineListener listener) {
         try {
-            Log.d(TAG, markerDataStandardized.getPathRef());
-            String encodedPathRef = URLEncoder.encode(markerDataStandardized.getPathRef(), "UTF-8");
+            Log.d(TAG, markerStandardized.getPathRef());
+            String encodedPathRef = URLEncoder.encode(markerStandardized.getPathRef(), "UTF-8");
             Log.d(TAG, encodedPathRef);
             getService(BASE_URL_BUS_TRACKER).getPath(encodedPathRef).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<BusTrackerVehiclePath> call, @NonNull Response<BusTrackerVehiclePath> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        markerDataStandardized.setMarkerDataRoute(response.body());
-                        listener.onResponseRouteLineListener(markerDataStandardized);
+                        markerStandardized.setMarkerDataRoute(response.body());
+                        listener.onResponseRouteLineListener(markerStandardized);
                     } else {
                         listener.onErrorRouteLineListener("Erreur: " + response);
                     }
@@ -348,19 +348,19 @@ public class FetchingManager {
     }
 
     // ==================== CONVERSION ====================
-    private List<MarkerDataStandardized> convertMarkerDataList(List<BusTrackerMarkerData> busTrackerMarkerDataList) {
-        List<MarkerDataStandardized> result = new ArrayList<>();
+    private List<MarkerStandardized> convertMarkerDataList(List<BusTrackerMarkerData> busTrackerMarkerDataList) {
+        List<MarkerStandardized> result = new ArrayList<>();
 
         if (busTrackerMarkerDataList == null || busTrackerMarkerDataList.isEmpty()) return result;
 
         for (BusTrackerMarkerData busTrackerMarkerData : busTrackerMarkerDataList) {
             try {
                 MarkerType type = MarkerType.guestFromMarkerId(busTrackerMarkerData.getId()); //determiner type
-                MarkerDataStandardized standardized = MarkerDataStandardized.createNewMarkerFrom(busTrackerMarkerData, type); //on convert
+                MarkerStandardized standardized = MarkerStandardized.createNewMarkerFrom(busTrackerMarkerData, type); //on convert
 
                 result.add(standardized);
             } catch (Exception e) {
-                Log.e("FetchingManager", "Erreur conversion BusTrackerMarkerData -> MarkerDataStandardized: " + e.getMessage());
+                Log.e("FetchingManager", "Erreur conversion BusTrackerMarkerData -> MarkerStandardized: " + e.getMessage());
             }
         }
 

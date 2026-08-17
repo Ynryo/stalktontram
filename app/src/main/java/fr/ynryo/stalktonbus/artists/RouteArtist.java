@@ -23,8 +23,8 @@ import java.util.List;
 import fr.ynryo.stalktonbus.MainActivity;
 import fr.ynryo.stalktonbus.R;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerVehiclePath;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStop;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStop;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
 
 public class RouteArtist {
@@ -38,12 +38,12 @@ public class RouteArtist {
         this.context = context;
     }
 
-    public void drawVehicleRoute(MarkerDataStandardized mData) {
+    public void drawVehicleRoute(MarkerStandardized mData) {
         if (mData == null) return;
         if (mData.getPathRef() != null) {
             context.getFetcher().fetchBusLine(mData, new FetchingManager.OnRouteLineListener() {
                 @Override
-                public void onResponseRouteLineListener(MarkerDataStandardized mData) {
+                public void onResponseRouteLineListener(MarkerStandardized mData) {
                     if (mData.getMarkerDataRoute() != null) {
                         PolylineOptions options = new PolylineOptions()
                                 .width(12)
@@ -86,14 +86,14 @@ public class RouteArtist {
         }
     }
 
-    private void drawStopCircles(MarkerDataStandardized mData) {
+    private void drawStopCircles(MarkerStandardized mData) {
         for (Marker m : stopMarkers) m.remove();
         stopMarkers.clear();
 
-        List<MarkerDataStop> stops = mData.getStops();
+        List<MarkerStop> stops = mData.getStops();
         if (stops == null || stops.isEmpty()) return;
 
-        for (MarkerDataStop stop : stops) {
+        for (MarkerStop stop : stops) {
             if (stop.getLatitude() == 0 && stop.getLongitude() == 0) continue;
 
             BitmapDescriptor icon = createStopIcon(stop.getStopName(), mData);
@@ -108,7 +108,7 @@ public class RouteArtist {
         }
     }
 
-    private BitmapDescriptor createStopIcon(String stopName, MarkerDataStandardized mData) {
+    private BitmapDescriptor createStopIcon(String stopName, MarkerStandardized mData) {
         View view = LayoutInflater.from(context).inflate(R.layout.stop_marker, null);
 
         //point

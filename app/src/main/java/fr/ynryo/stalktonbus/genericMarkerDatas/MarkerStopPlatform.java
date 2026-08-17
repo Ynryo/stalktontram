@@ -2,16 +2,16 @@ package fr.ynryo.stalktonbus.genericMarkerDatas;
 
 import androidx.annotation.NonNull;
 
-public class StopPlatform {
+public class MarkerStopPlatform {
     private final String platformName;
     private final String stopUIC;
     private final float percentage;
 
-    public StopPlatform(String platformName) {
+    public MarkerStopPlatform(String platformName) {
         this(platformName, null, 0);
     }
 
-    public StopPlatform(String platformName, String stopUIC, float percentage) {
+    public MarkerStopPlatform(String platformName, String stopUIC, float percentage) {
         this.platformName = platformName;
         this.stopUIC = stopUIC;
         this.percentage = percentage;
@@ -32,7 +32,7 @@ public class StopPlatform {
     @NonNull
     @Override
     public String toString() {
-        return "StopPlatform{" +
+        return "MarkerStopPlatform{" +
                 "platformName='" + platformName + '\'' +
                 ", stopUIC='" + stopUIC + '\'' +
                 ", percentage=" + percentage +

@@ -9,7 +9,7 @@ import java.util.List;
 
 import fr.ynryo.stalktonbus.MainActivity;
 import fr.ynryo.stalktonbus.R;
-import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerDataStandardized;
+import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.managers.SaveManager;
 
 /**
@@ -20,7 +20,7 @@ public class FavoriteManager {
     private final List<Favorite> favoriteLines = new ArrayList<>();
     private final MainActivity context;
     private final SaveManager saveManager;
-    private MarkerDataStandardized showedVehicleId;
+    private MarkerStandardized showedVehicleId;
     private FloatingActionButton favoriteButton;
 
     public FavoriteManager(MainActivity context, SaveManager saveManager) {
@@ -30,7 +30,7 @@ public class FavoriteManager {
         this.favoriteLines.addAll(saveManager != null ? saveManager.loadFavoriteLines() : new ArrayList<>());
     }
 
-    public void toggleFavorite(MarkerDataStandardized mData) {
+    public void toggleFavorite(MarkerStandardized mData) {
         if (mData == null) return;
         if (isFavorite(mData)) {
             removeFavorite(mData);
@@ -39,7 +39,7 @@ public class FavoriteManager {
         }
     }
 
-    public void addFavorite(MarkerDataStandardized mData) {
+    public void addFavorite(MarkerStandardized mData) {
         if (isFavorite(mData)) return;
         this.showedVehicleId = mData;
         favoriteLines.add(new Favorite(mData.getLineId(), mData.getLineNumber(), mData.getDestination(), mData.getFillColor(), mData.getTextColor(), mData.getNetworkRef()));
@@ -47,7 +47,7 @@ public class FavoriteManager {
         saveManager.saveFavoriteLines(favoriteLines);
     }
 
-    public void removeFavorite(MarkerDataStandardized mData) {
+    public void removeFavorite(MarkerStandardized mData) {
         if (!isFavorite(mData)) return;
         this.showedVehicleId = null;
         favoriteLines.removeIf(f -> f.getLigneId() == mData.getLineId() && f.getDestination().equals(mData.getDestination()));
@@ -55,7 +55,7 @@ public class FavoriteManager {
         saveManager.saveFavoriteLines(favoriteLines);
     }
 
-    public boolean isFavorite(MarkerDataStandardized mData) {
+    public boolean isFavorite(MarkerStandardized mData) {
         if (mData == null) return false;
         for (Favorite f : favoriteLines) {
             if (f.getLigneId() == mData.getLineId() && f.getDestination().equals(mData.getDestination())) {
@@ -69,7 +69,7 @@ public class FavoriteManager {
         return favoriteLines;
     }
 
-    public void setFavoriteButton(FloatingActionButton favoriteButton, MarkerDataStandardized mData) {
+    public void setFavoriteButton(FloatingActionButton favoriteButton, MarkerStandardized mData) {
         this.favoriteButton = favoriteButton;
         if (this.favoriteButton == null) return;
         if (mData.isTrain()) this.favoriteButton.setVisibility(View.GONE); //temp pour éviter les bugs
