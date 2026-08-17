@@ -20,7 +20,7 @@
         android:orientation="horizontal"
         android:paddingVertical="8dp">
 
-        <LinearLayout
+        <fr.ynryo.stalktonbus.views.SquareLinearLayout
             android:id="@+id/llPlatformContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                 android:includeFontPadding="false"
                 android:textColor="@android:color/white"
                 android:textSize="13sp" />
-        </LinearLayout>
+        </fr.ynryo.stalktonbus.views.SquareLinearLayout>
 
         <TextView
             android:id="@+id/tvStopName"
