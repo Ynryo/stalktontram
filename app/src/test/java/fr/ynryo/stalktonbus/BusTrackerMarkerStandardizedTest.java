@@ -15,7 +15,7 @@ public class BusTrackerMarkerStandardizedTest {
     @Test
     public void testCreateNewMarkerFromWithNullOrEmptyFieldsDoesNotThrow() {
         BusTrackerMarkerData busTrackerMarkerData = new BusTrackerMarkerData();
-        MarkerType type = MarkerType.guestFromMarkerId(busTrackerMarkerData.getId());
+        MarkerType type = MarkerType.guessFromMarkerId(busTrackerMarkerData.getId());
 
         MarkerStandardized standardized = MarkerStandardized.createNewMarkerFrom(busTrackerMarkerData, type);
         assertNotNull(standardized);

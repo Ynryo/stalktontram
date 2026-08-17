@@ -355,7 +355,7 @@ public class FetchingManager {
 
         for (BusTrackerMarkerData busTrackerMarkerData : busTrackerMarkerDataList) {
             try {
-                MarkerType type = MarkerType.guestFromMarkerId(busTrackerMarkerData.getId()); //determiner type
+                MarkerType type = MarkerType.guessFromMarkerId(busTrackerMarkerData.getId()); //determiner type
                 MarkerStandardized standardized = MarkerStandardized.createNewMarkerFrom(busTrackerMarkerData, type); //on convert
 
                 result.add(standardized);
