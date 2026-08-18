@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -45,7 +46,7 @@ import fr.ynryo.stalktonbus.managers.favorite.FavoriteManager;
  * @author Ynryo
  * @version 1.2.4
  */
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraMoveStartedListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraMoveStartedListener {
     private static final String TAG = "MainActivity";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final float DEFAULT_ZOOM = 13f;
@@ -174,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(PARIS, DEFAULT_ZOOM));
         this.googleMap.setOnCameraIdleListener(this);
         this.googleMap.setOnMarkerClickListener(this);
+        this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnCameraMoveListener(this);
         this.googleMap.setOnCameraMoveStartedListener(this);
         this.googleMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -213,6 +215,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onMarkerClick(@NonNull Marker marker) {
         markerArtist.onMarkerClick(marker);
         return true;
+    }
+
+    @Override
+    public void onMapClick(@NonNull LatLng clickLatLng) {
+        if (googleMap == null || markerArtist == null) return;
+
+        Point clickScreenPoint = googleMap.getProjection().toScreenLocation(clickLatLng);
+        int touchRadiusPx = dpToPx(36);
+
+        Marker closestMarker = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (Marker marker : markerArtist.getActiveMarkers().values()) {
+            if (marker == null || !marker.isVisible()) continue;
+            Point markerScreenPoint = googleMap.getProjection().toScreenLocation(marker.getPosition());
+            double dist = Math.hypot(clickScreenPoint.x - markerScreenPoint.x, clickScreenPoint.y - markerScreenPoint.y);
+            if (dist <= touchRadiusPx && dist < minDistance) {
+                minDistance = dist;
+                closestMarker = marker;
+            }
+        }
+
+        if (closestMarker != null) {
+            markerArtist.onMarkerClick(closestMarker);
+        }
     }
 
     @Override
