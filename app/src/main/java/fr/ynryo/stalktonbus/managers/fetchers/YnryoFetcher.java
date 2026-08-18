@@ -1,15 +1,16 @@
 package fr.ynryo.stalktonbus.managers.fetchers;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.version.YnryoVersionResponse;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
+import fr.ynryo.stalktonbus.services.ApiClientFactory;
 import fr.ynryo.stalktonbus.services.YnryoApiService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Fetcher dédié aux appels API de mise à jour et versioning (dl.ynryo.fr)
@@ -21,11 +22,7 @@ public class YnryoFetcher {
     private final YnryoApiService apiService;
 
     public YnryoFetcher() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        this.apiService = retrofit.create(YnryoApiService.class);
+        this.apiService = ApiClientFactory.createService(BASE_URL, YnryoApiService.class);
     }
 
     /**
@@ -42,17 +39,20 @@ public class YnryoFetcher {
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseVersionListener(response.body());
                     } else {
+                        Log.e(TAG, "fetchLatestVersion code erreur: " + response.code());
                         listener.onErrorVersionListener("Code erreur: " + response.code());
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<YnryoVersionResponse> call, @NonNull Throwable t) {
+                    Log.e(TAG, "fetchLatestVersion échec: " + t.getMessage(), t);
                     if (listener == null) return;
                     listener.onErrorVersionListener(t.getMessage());
                 }
             });
         } catch (Exception e) {
+            Log.e(TAG, "fetchLatestVersion exception: " + e.getMessage(), e);
             if (listener == null) return;
             listener.onErrorVersionListener(e.getMessage());
         }

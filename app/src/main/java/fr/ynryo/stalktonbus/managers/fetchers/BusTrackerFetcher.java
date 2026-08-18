@@ -20,12 +20,11 @@ import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerType;
 import fr.ynryo.stalktonbus.managers.FetchingManager;
 import fr.ynryo.stalktonbus.managers.um.TrainUmAssembler;
+import fr.ynryo.stalktonbus.services.ApiClientFactory;
 import fr.ynryo.stalktonbus.services.BusTrackerApiService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Fetcher dédié aux appels API du fournisseur bus-tracker.fr
@@ -37,11 +36,7 @@ public class BusTrackerFetcher {
     private final BusTrackerApiService apiService;
 
     public BusTrackerFetcher() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        this.apiService = retrofit.create(BusTrackerApiService.class);
+        this.apiService = ApiClientFactory.createService(BASE_URL, BusTrackerApiService.class);
     }
 
     /**
@@ -54,6 +49,7 @@ public class BusTrackerFetcher {
      */
     public void fetchMarkers(LatLngBounds bounds, String lineId, FetchingManager.OnMarkersListener listener) {
         if (bounds == null) {
+            Log.w(TAG, "fetchMarkers: bounds sont null");
             if (listener == null) return;
             listener.onErrorMarkersListener("Bounds are null");
             return;
@@ -73,12 +69,14 @@ public class BusTrackerFetcher {
                     List<MarkerStandardized> standardizedMarkers = convertMarkerDataList(response.body().getItems());
                     listener.onResponseMarkersListener(standardizedMarkers);
                 } else {
+                    Log.e(TAG, "fetchMarkers: code erreur HTTP " + response.code());
                     listener.onErrorMarkersListener("Erreur réponse: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<BusTrackerMarkersList> call, @NonNull Throwable t) {
+                Log.e(TAG, "fetchMarkers échec: " + t.getMessage(), t);
                 if (listener == null) return;
                 listener.onErrorMarkersListener(t.getMessage());
             }
@@ -136,6 +134,7 @@ public class BusTrackerFetcher {
 
                     @Override
                     public void onErrorVehicleDetailsListener(String error) {
+                        Log.e(TAG, "fetchVehicleStopsInfo UM erreur: " + error);
                         if (listener == null) return;
                         listener.onErrorVehicleDetailsListener(error);
                     }
@@ -155,18 +154,21 @@ public class BusTrackerFetcher {
                         markerStandardized.setVehicleDetails(vehicleData);
                         listener.onResponseVehicleDetailsListener(markerStandardized);
                     } else {
+                        Log.e(TAG, "fetchVehicleStopsInfo code erreur: " + response.code());
                         listener.onErrorVehicleDetailsListener(String.valueOf(response.code()));
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<BusTrackerVehicleDetails> call, @NonNull Throwable t) {
+                    Log.e(TAG, "fetchVehicleStopsInfo échec: " + t.getMessage(), t);
                     if (listener == null) return;
                     listener.onErrorVehicleDetailsListener(t.getMessage());
                 }
             });
 
         } catch (Exception e) {
+            Log.e(TAG, "fetchVehicleStopsInfo exception: " + e.getMessage(), e);
             if (listener == null) return;
             listener.onErrorVehicleDetailsListener(e.getMessage());
         }
@@ -186,12 +188,14 @@ public class BusTrackerFetcher {
                 if (response.isSuccessful() && response.body() != null) {
                     listener.onResponseNetworkDataListener(response.body());
                 } else {
+                    Log.e(TAG, "fetchNetworkData code erreur: " + response.code());
                     listener.onErrorNetworkDataListener("Erreur réponse: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<BusTrackerNetworkData> call, @NonNull Throwable t) {
+                Log.e(TAG, "fetchNetworkData échec: " + t.getMessage(), t);
                 if (listener == null) return;
                 listener.onErrorNetworkDataListener(t.getMessage());
             }
@@ -215,17 +219,20 @@ public class BusTrackerFetcher {
                         markerStandardized.setMarkerDataRoute(response.body());
                         listener.onResponseRouteLineListener(markerStandardized);
                     } else {
+                        Log.e(TAG, "fetchBusLine code erreur: " + response.code());
                         listener.onErrorRouteLineListener("Erreur: " + response);
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<BusTrackerVehiclePath> call, @NonNull Throwable t) {
+                    Log.e(TAG, "fetchBusLine échec: " + t.getMessage(), t);
                     if (listener == null) return;
                     listener.onErrorRouteLineListener(t.getMessage());
                 }
             });
         } catch (Exception e) {
+            Log.e(TAG, "fetchBusLine exception: " + e.getMessage(), e);
             if (listener == null) return;
             listener.onErrorRouteLineListener(e.getMessage());
         }
@@ -245,17 +252,20 @@ public class BusTrackerFetcher {
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseNetworkListener(response.body());
                     } else {
+                        Log.e(TAG, "fetchNetworks code erreur: " + response.code());
                         listener.onErrorNetworkListener("Code erreur: " + response.code());
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<List<BusTrackerNetworkData>> call, @NonNull Throwable t) {
+                    Log.e(TAG, "fetchNetworks échec: " + t.getMessage(), t);
                     if (listener == null) return;
                     listener.onErrorNetworkListener(t.getMessage());
                 }
             });
         } catch (Exception e) {
+            Log.e(TAG, "fetchNetworks exception: " + e.getMessage(), e);
             if (listener == null) return;
             listener.onErrorNetworkListener(e.getMessage());
         }
@@ -275,17 +285,20 @@ public class BusTrackerFetcher {
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseRegionsListener(response.body());
                     } else {
+                        Log.e(TAG, "fetchRegions code erreur: " + response.code());
                         listener.onErrorRegionsListener("Erreur régions: " + response.code());
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<List<BusTrackerRegionData>> call, @NonNull Throwable t) {
+                    Log.e(TAG, "fetchRegions échec: " + t.getMessage(), t);
                     if (listener == null) return;
                     listener.onErrorRegionsListener(t.getMessage());
                 }
             });
         } catch (Exception e) {
+            Log.e(TAG, "fetchRegions exception: " + e.getMessage(), e);
             if (listener == null) return;
             listener.onErrorRegionsListener(e.getMessage());
         }
@@ -308,11 +321,13 @@ public class BusTrackerFetcher {
 
                 @Override
                 public void onFailure(@NonNull Call<BusTrackerVehicleDetails> call, @NonNull Throwable t) {
+                    Log.e(TAG, "fetchVehicleAlive échec: " + t.getMessage(), t);
                     if (listener == null) return;
                     listener.onErrorVehicleAliveListener(t.getMessage());
                 }
             });
         } catch (Exception e) {
+            Log.e(TAG, "fetchVehicleAlive exception: " + e.getMessage(), e);
             if (listener == null) return;
             listener.onErrorVehicleAliveListener(e.getMessage());
         }
