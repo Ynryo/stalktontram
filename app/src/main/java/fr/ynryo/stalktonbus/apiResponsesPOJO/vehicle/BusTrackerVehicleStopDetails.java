@@ -25,6 +25,10 @@ public class BusTrackerVehicleStopDetails {
         return expectedTime;
     }
 
+    public String getStopRef() {
+        return stopRef;
+    }
+
     public String getStopUIC() {
         return stopRef.contains("StopPoint") ? stopRef.split(":")[2].substring(0, 7) : null;
     }

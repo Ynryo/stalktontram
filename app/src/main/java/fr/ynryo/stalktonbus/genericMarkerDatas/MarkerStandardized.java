@@ -104,17 +104,16 @@ public class MarkerStandardized {
     }
 
     // à la priorité sur les datas (bus tracker api)
-
     /**
-     * Updates the details of the current vehicle instance using the given {@code BusTrackerVehicleDetails} object.
-     * Populates various fields such as line ID, destination, network ID, path reference, stops,
-     * and additional attributes related to the vehicle's journey and live data.
+     * Met à jour les détails de l'instance du véhicule actuel à l'aide de l'objet {@code BusTrackerVehicleDetails} fourni.
+     * Remplit divers champs tels que l'identifiant de la ligne, la destination, l'identifiant du réseau, la référence de parcours, les arrêts,
+     * ainsi que d'autres attributs liés au trajet du véhicule et aux données en temps réel.
      *
-     * @param busTrackerVehicleDetails A non-null {@link BusTrackerVehicleDetails} object containing details such as line ID,
-     *                                 destination, network ID, path reference, and a list of vehicle stops.
-     *                                 Each stop may contain information about stop reference, stop name, platform name,
-     *                                 expected and aimed times, stop order, coordinates, distance traveled,
-     *                                 flags (e.g., NO_PICKUP, NO_DROPOFF), and other related metadata.
+     * @param busTrackerVehicleDetails Un objet {@link BusTrackerVehicleDetails} non nul contenant les détails tels que l'identifiant de ligne,
+     *                                 la destination, l'identifiant réseau, la référence de parcours et la liste des arrêts du véhicule.
+     *                                 Chaque arrêt peut contenir des informations sur la référence d'arrêt, le nom de l'arrêt, le nom du quai,
+     *                                 les horaires théoriques et prévus, l'ordre de l'arrêt, les coordonnées, la distance parcourue,
+     *                                 les indicateurs (ex. : NO_PICKUP, NO_DROPOFF) et d'autres métadonnées associées.
      */
     public void setVehicleDetails(@NonNull BusTrackerVehicleDetails busTrackerVehicleDetails) {
         this.markerIdentity.setLineId(busTrackerVehicleDetails.getLineId());
@@ -133,8 +132,10 @@ public class MarkerStandardized {
             Time expectedTime = Time.parse(busTrackerVehicleStopDetails.getExpectedTime());
             boolean isRealtime = expectedTime != null;
 
+            String stopRef = isTrain() ? busTrackerVehicleStopDetails.getStopUIC() : busTrackerVehicleStopDetails.getStopRef();
+
             MarkerStop stop = new MarkerStop(
-                    busTrackerVehicleStopDetails.getStopUIC(),
+                    stopRef,
                     busTrackerVehicleStopDetails.getStopName(),
                     Time.calculateDelayMinutes(aimedTime, expectedTime),
                     isRealtime ? expectedTime : aimedTime,
@@ -149,7 +150,7 @@ public class MarkerStandardized {
 
             if (busTrackerVehicleStopDetails.getPlatformName() != null) {
                 stop.setPlatform(
-                        new MarkerStopPlatform(busTrackerVehicleStopDetails.getPlatformName(), busTrackerVehicleStopDetails.getStopUIC(), 100)
+                        new MarkerStopPlatform(busTrackerVehicleStopDetails.getPlatformName(), stopRef, 100)
                 );
             }
 
