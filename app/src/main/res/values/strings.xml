@@ -14,7 +14,7 @@
     <string name="network_logo">Logo du réseau de transport</string>
     <string name="compass_desc">Bousole</string>
     <string name="back">Retour</string>
-    <string name="menu_filters">Filtrer les transports</string>
+    <string name="menu_filters">Filtrer les lignes</string>
     <string name="menu_favorites_lines">Lignes de bus favorites</string>
     <string name="menu_favorites_stops">Arrêts de bus favoris</string>
     <string name="menu_favorites_trains">Trains favoris</string>

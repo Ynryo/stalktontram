@@ -167,16 +167,16 @@
                     android:textAlignment="viewStart"
                     app:icon="@drawable/icon_train" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_menu_credits"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="@string/menu_credits"
-                    android:textAllCaps="false"
-                    android:textAlignment="viewStart"
-                    app:icon="@drawable/icon_attribution" />
+                <!--                <com.google.android.material.button.MaterialButton-->
+                <!--                    android:id="@+id/btn_menu_credits"-->
+                <!--                    style="@style/Widget.Material3.Button.TonalButton"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginBottom="12dp"-->
+                <!--                    android:text="@string/menu_credits"-->
+                <!--                    android:textAllCaps="false"-->
+                <!--                    android:textAlignment="viewStart"-->
+                <!--                    app:icon="@drawable/icon_attribution" />-->
 
             </LinearLayout>
 

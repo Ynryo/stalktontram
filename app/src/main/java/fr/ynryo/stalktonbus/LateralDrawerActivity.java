@@ -72,7 +72,7 @@ public class LateralDrawerActivity {
         View btnFavoritesLines = context.findViewById(R.id.btn_menu_favorites_lines);
         View btnFavoritesStops = context.findViewById(R.id.btn_menu_favorites_stops);
         View btnFavoritesTrains = context.findViewById(R.id.btn_menu_favorites_trains);
-        View btnCredits = context.findViewById(R.id.btn_menu_credits);
+//        View btnCredits = context.findViewById(R.id.btn_menu_credits);
 
         View btnBackFilters = context.findViewById(R.id.btn_back_to_menu_filters);
         View btnBackFavoritesLines = context.findViewById(R.id.btn_back_to_menu_favorites_lines);
@@ -84,7 +84,7 @@ public class LateralDrawerActivity {
         if (btnFavoritesLines != null) btnFavoritesLines.setOnClickListener(v -> showFavoriteStopsPage());
         if (btnFavoritesStops != null) btnFavoritesStops.setOnClickListener(v -> showFavoriteStopsPage());
         if (btnFavoritesTrains != null) btnFavoritesTrains.setOnClickListener(v -> showFavoriteStopsPage());
-        if (btnCredits != null) btnCredits.setOnClickListener(v -> showCreditsPage());
+//        if (btnCredits != null) btnCredits.setOnClickListener(v -> showCreditsPage());
         
         if (btnBackFilters != null) btnBackFilters.setOnClickListener(v -> showMainMenu());
         if (btnBackFavoritesLines != null) btnBackFavoritesLines.setOnClickListener(v -> showMainMenu());

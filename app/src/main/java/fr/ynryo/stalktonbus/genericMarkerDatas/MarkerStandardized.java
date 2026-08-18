@@ -131,13 +131,13 @@ public class MarkerStandardized {
 
             Time aimedTime = Time.parse(busTrackerVehicleStopDetails.getAimedTime());
             Time expectedTime = Time.parse(busTrackerVehicleStopDetails.getExpectedTime());
-            boolean onLive = expectedTime != null;
+            boolean isRealtime = expectedTime != null;
 
             MarkerStop stop = new MarkerStop(
                     busTrackerVehicleStopDetails.getStopUIC(),
                     busTrackerVehicleStopDetails.getStopName(),
                     Time.calculateDelayMinutes(aimedTime, expectedTime),
-                    onLive ? expectedTime : aimedTime,
+                    isRealtime ? expectedTime : aimedTime,
                     busTrackerVehicleStopDetails.getStopOrder(),
                     busTrackerVehicleStopDetails.getLongitude(),
                     busTrackerVehicleStopDetails.getLatitude(),
@@ -153,7 +153,7 @@ public class MarkerStandardized {
                 );
             }
 
-            stop.setOnLive(onLive);
+            stop.setOnLive(isRealtime);
 
             if (busTrackerVehicleStopDetails.getFlags().contains("NO_PICKUP")) {
                 stop.setStopType(StopType.NO_PICKUP);

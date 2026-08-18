@@ -346,14 +346,14 @@ public class MarkerStopsDetailActivity {
     // ==================== ADAPTER ====================
 
     private static class StopViewHolder extends RecyclerView.ViewHolder {
-        final View llPlatformContainer;
+        final View sllPlatformContainer;
         final TextView tvPlatform, tvPlatformLabel, tvStopName, tvDepartureTime, tvAtStopTime, tvArrivingTime, tvDelay;
         final ImageView ivArrivingTimeIcon, ivDepartureTimeIcon;
         final FrameLayout flTimeline;
 
         StopViewHolder(View itemView) {
             super(itemView);
-            llPlatformContainer = itemView.findViewById(R.id.llPlatformContainer);
+            sllPlatformContainer = itemView.findViewById(R.id.llPlatformContainer);
             tvPlatform = itemView.findViewById(R.id.tvPlatform);
             tvPlatformLabel = itemView.findViewById(R.id.tvPlatformLabel);
             tvStopName = itemView.findViewById(R.id.tvStopName);
@@ -510,9 +510,9 @@ public class MarkerStopsDetailActivity {
             MarkerStopPlatform platform = stop.getPlatform();
             if (platform != null && platform.getPlatformName() != null) {
                 vh.tvPlatform.setText(platform.getPlatformName());
-                vh.llPlatformContainer.setVisibility(View.VISIBLE);
+                vh.sllPlatformContainer.setVisibility(View.VISIBLE);
 
-                GradientDrawable gd = (GradientDrawable) vh.llPlatformContainer.getBackground().mutate();
+                GradientDrawable gd = (GradientDrawable) vh.sllPlatformContainer.getBackground().mutate();
                 boolean isPlatformGuessed = platform.getPercentage() != 100;
                 if (isPlatformGuessed) {
                     vh.tvPlatform.setTextColor(Color.GRAY);
@@ -520,7 +520,7 @@ public class MarkerStopsDetailActivity {
                     gd.setStroke(2, Color.GRAY, 8, 8);
                 }
             } else {
-                vh.llPlatformContainer.setVisibility(View.GONE);
+                vh.sllPlatformContainer.setVisibility(View.GONE);
             }
         }
 
