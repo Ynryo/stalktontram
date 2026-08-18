@@ -137,7 +137,11 @@ public class MarkerArtist {
                     existingMarker.setTag(fetchedMarkerStandardized);
                 }
             } else {
-                Marker newMarker = googleMap.addMarker(new MarkerOptions().position(position).icon(createMarkerBitmapDescriptor(fetchedMarkerStandardized, mapRotation, followManager.isFollowing(id))).anchor(0.5f, 0.3f));
+                Marker newMarker = googleMap.addMarker(new MarkerOptions()
+                        .position(position)
+                        .icon(createMarkerBitmapDescriptor(fetchedMarkerStandardized, mapRotation, followManager.isFollowing(id)))
+                        .anchor(0.5f, 0.3f)
+                        .zIndex(4f));
 
                 if (newMarker != null) {
                     newMarker.setTag(fetchedMarkerStandardized);

@@ -46,7 +46,7 @@ public class RouteArtist {
                 public void onResponseRouteLineListener(MarkerStandardized mData) {
                     if (mData.getMarkerDataRoute() != null) {
                         PolylineOptions options = new PolylineOptions()
-                                .width(12)
+                                .width(16f)
                                 .color(Color.parseColor(mData.getFillColor() != null ? mData.getFillColor() : "#424242"))
                                 .geodesic(true)
                                 .zIndex(2.0f);
@@ -103,7 +103,7 @@ public class RouteArtist {
                     .icon(icon)
                     .anchor(0.0f, 0.5f) // label à droite du point
                     .flat(false)
-                    .zIndex(3.0f));
+                    .zIndex(3f));
             if (marker != null) stopMarkers.add(marker);
         }
     }
