@@ -12,7 +12,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Fetcher dédié aux appels API de bus-tracker.fr
+ * Fetcher dédié aux appels API de mise à jour et versioning (dl.ynryo.fr)
  */
 public class YnryoFetcher {
     private static final String TAG = "YnryoFetcher";
@@ -28,11 +28,17 @@ public class YnryoFetcher {
         this.apiService = retrofit.create(YnryoApiService.class);
     }
 
+    /**
+     * Récupère les métadonnées de la dernière version disponible de l'application (numéro de version, URL d'APK, changelog).
+     *
+     * @param listener Callback notifié avec les informations de version {@link YnryoVersionResponse} ou l'erreur
+     */
     public void fetchLatestVersion(FetchingManager.OnVersionListener listener) {
         try {
             apiService.getLatestVersion().enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<YnryoVersionResponse> call, @NonNull Response<YnryoVersionResponse> response) {
+                    if (listener == null) return;
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseVersionListener(response.body());
                     } else {
@@ -42,10 +48,12 @@ public class YnryoFetcher {
 
                 @Override
                 public void onFailure(@NonNull Call<YnryoVersionResponse> call, @NonNull Throwable t) {
+                    if (listener == null) return;
                     listener.onErrorVersionListener(t.getMessage());
                 }
             });
         } catch (Exception e) {
+            if (listener == null) return;
             listener.onErrorVersionListener(e.getMessage());
         }
     }

@@ -14,7 +14,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Fetcher dédié aux appels API de bus-tracker.fr
+ * Fetcher dédié aux appels API du fournisseur CartoTchoo (api.tchoo.net)
  */
 public class TchooFetcher {
     private static final String TAG = "TchooFetcher";
@@ -30,11 +30,19 @@ public class TchooFetcher {
         this.apiService = retrofit.create(TchooApiService.class);
     }
 
+    /**
+     * Récupère la prédiction / estimation de la voie de quai d'un train pour une gare donnée.
+     *
+     * @param uicCode  Code UIC de la gare concernée (ex: 87391003)
+     * @param trainNum Numéro de circulation du train (ex: 864120)
+     * @param listener Callback notifié avec la liste des prédictions {@link CartoTchooGuessPlatform} ou l'erreur
+     */
     public void fetchGuestPlatform(String uicCode, String trainNum, FetchingManager.OnGuessPlatformListener listener) {
         try {
             apiService.getGuestPlatform(uicCode, trainNum).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<List<CartoTchooGuessPlatform>> call, @NonNull Response<List<CartoTchooGuessPlatform>> response) {
+                    if (listener == null) return;
                     if (response.isSuccessful() && response.body() != null) {
                         listener.onResponseGuessPlatformListener(response.body());
                     } else {
@@ -44,10 +52,12 @@ public class TchooFetcher {
 
                 @Override
                 public void onFailure(@NonNull Call<List<CartoTchooGuessPlatform>> call, @NonNull Throwable t) {
+                    if (listener == null) return;
                     listener.onErrorGuessPlatformListener(t.getMessage());
                 }
             });
         } catch (Exception e) {
+            if (listener == null) return;
             listener.onErrorGuessPlatformListener(e.getMessage());
         }
     }
