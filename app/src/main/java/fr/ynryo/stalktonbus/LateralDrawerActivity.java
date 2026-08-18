@@ -438,22 +438,22 @@ public class LateralDrawerActivity {
                     for (MarkerStandardized vehicle : markerStandardizedList) {
                         context.getFetcher().fetchVehicleStopsInfo(vehicle, new FetchingManager.OnVehicleDetailsListener() {
                             @Override
-                            public void onResponseVehicleDetailsListener(MarkerStandardized markerDetails) {
-                                if (f.getDestination().equals(markerDetails.getDestination())) {
+                            public void onResponseVehicleDetailsListener(MarkerStandardized markerStandardized) {
+                                if (f.getDestination().equals(markerStandardized.getDestination())) {
                                     View vehicleView = LayoutInflater.from(context).inflate(R.layout.favorite_line_item, lineVehiclesContainer, false);
                                     ImageView ivMarker = vehicleView.findViewById(R.id.iv_marker);
                                     TextView tvNextStop = vehicleView.findViewById(R.id.tv_next_stop);
                                     TextView tvTime = vehicleView.findViewById(R.id.tv_time);
 
-                                    ivMarker.setImageBitmap(context.getMarkerArtist().createMarker(markerDetails, 0, false));
-                                    tvNextStop.setText(markerDetails.getNextStop() != null ? markerDetails.getNextStop().getStopName() : context.getString(R.string.no_data));
-                                    tvTime.setText(markerDetails.getNextStop() != null && markerDetails.getNextStop().getDepartureTime() != null ? markerDetails.getNextStop().getDepartureTime().formatHHmm() : context.getString(R.string.no_data));
+                                    ivMarker.setImageBitmap(context.getMarkerArtist().createMarker(markerStandardized, 0, false));
+                                    tvNextStop.setText(markerStandardized.getNextStop() != null ? markerStandardized.getNextStop().getStopName() : context.getString(R.string.no_data));
+                                    tvTime.setText(markerStandardized.getNextStop() != null && markerStandardized.getNextStop().getDepartureTime() != null ? markerStandardized.getNextStop().getDepartureTime().formatHHmm() : context.getString(R.string.no_data));
                                     vehicleView.setOnClickListener(v -> {
                                         if (drawerLayout != null) {
                                             drawerLayout.closeDrawer(GravityCompat.START);
                                         }
-                                        context.getMarkerArtist().getMarkerStopsDetailActivity().open(markerDetails);
-                                        context.centerOnMarker(markerDetails, false, true);
+                                        context.getMarkerArtist().getMarkerStopsDetailActivity().open(markerStandardized);
+                                        context.centerOnMarker(markerStandardized, false, true);
                                     });
                                     lineVehiclesContainer.addView(vehicleView);
                                 }

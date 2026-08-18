@@ -320,7 +320,7 @@ public class MarkerArtist {
             MarkerStandardized data = (MarkerStandardized) marker.getTag();
             float bearing = data != null ? data.getBearing() : 0f;
 
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(toPosition).bearing(bearing).tilt(60f).zoom(17f).build()), 2000, null);
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(toPosition).bearing(bearing).tilt(75f).zoom(17f).build()), 2000, null);
         }
 
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);

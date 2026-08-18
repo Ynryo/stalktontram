@@ -43,6 +43,7 @@ import fr.ynryo.stalktonbus.managers.favorite.FavoriteManager;
 
 /**
  * Classe principale, gère la vue et les managers
+ *
  * @author Ynryo
  * @version 1.2.4
  */
@@ -299,35 +300,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void centerOnMarker(String markerId, boolean isTilted, boolean isRotated) {
+    public void centerOnMarker(@NonNull String markerId, boolean isTilted, boolean isRotated) {
         Marker marker = markerArtist.getActiveMarkers().get(markerId);
-        if (marker != null && googleMap != null) {
-            MarkerStandardized data = (MarkerStandardized) marker.getTag();
-            float bearing = data != null ? data.getBearing() : 0f;
+        if (marker == null) return;
+        MarkerStandardized markerStandardized = (MarkerStandardized) marker.getTag();
+        if (markerStandardized == null) return;
 
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
-                    new CameraPosition.Builder()
-                            .target(marker.getPosition())
-                            .bearing(isRotated ? bearing : 0)
-                            .tilt(isTilted ? 60f : 0)
-                            .zoom(17f)
-                            .build()
-            ), 1000, null);
-        }
+        centerOnMarker(markerStandardized, isTilted, isRotated);
     }
 
-    //TODO: refactor
-    public void centerOnMarker(MarkerStandardized markerStandardized, boolean isTilted, boolean isRotated) {
-        float bearing = markerStandardized != null ? markerStandardized.getBearing() : 0f;
-
+    public void centerOnMarker(@NonNull MarkerStandardized markerStandardized, boolean isTilted, boolean isRotated) {
+        float bearing = markerStandardized.getBearing();
+        if (googleMap == null) return;
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                 new CameraPosition.Builder()
                         .target(new LatLng(markerStandardized.getLatitude(), markerStandardized.getLongitude()))
                         .bearing(isRotated ? bearing : 0)
-                        .tilt(isTilted ? 60f : 0f)
+                        .tilt(isTilted ? 75f : 0f)
                         .zoom(17f)
                         .build()
-        ), 1000, null);
+        ), 2000, null);
     }
 
     private void fetchMarkers() {
