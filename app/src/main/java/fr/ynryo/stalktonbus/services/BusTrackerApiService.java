@@ -1,14 +1,12 @@
-package fr.ynryo.stalktonbus;
+package fr.ynryo.stalktonbus.services;
 
 import java.util.List;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.bus.BusTrackerVehiclePath;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.markers.BusTrackerMarkersList;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.region.BusTrackerRegionData;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.vehicle.BusTrackerVehicleDetails;
-import fr.ynryo.stalktonbus.apiResponsesPOJO.version.YnryoVersionResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -17,7 +15,7 @@ import retrofit2.http.Query;
 /**
  * Interface de l'API, gère les requêtes et les réponses
  */
-public interface ApiService {
+public interface BusTrackerApiService {
     /**
      * API call vers https://bus-tracker.fr/api/vehicle-journeys/markers + params
      * @param swLat sud ouest latitude
@@ -54,14 +52,5 @@ public interface ApiService {
     @GET("paths/{pathRef}")
     Call<BusTrackerVehiclePath> getPath(
         @Path(value = "pathRef", encoded = true) String pathRef
-    );
-
-    @GET("version/latest")
-    Call<YnryoVersionResponse> getLatestVersion();
-
-    @GET("guess_my_platform.php")
-    Call<List<CartoTchooGuessPlatform>> getGuestPlatform(
-            @Query(value = "uic", encoded = true) String uicCode,
-            @Query(value = "num", encoded = true) String trainNum
     );
 }
