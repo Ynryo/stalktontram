@@ -173,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap = googleMap;
         markerArtist.setGoogleMap(this.googleMap);
         this.googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        this.googleMap.setBuildingsEnabled(true);
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(PARIS, DEFAULT_ZOOM));
         this.googleMap.setOnCameraIdleListener(this);
         this.googleMap.setOnMarkerClickListener(this);

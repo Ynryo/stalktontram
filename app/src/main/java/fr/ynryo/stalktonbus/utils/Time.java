@@ -140,6 +140,8 @@ public class Time implements Comparable<Time> {
 
     /**
      * Calcule la durée en minutes entre deux objets Time.
+     * Priorise l'horodatage absolu (Instant) pour un calcul exact prenant en compte la date et les fuseaux.
+     * En repli sur LocalTime, gère le passage de minuit (±12h).
      *
      * @param start Heure de début.
      * @param end   Heure de fin.
@@ -147,10 +149,25 @@ public class Time implements Comparable<Time> {
      */
     @Nullable
     public static Long minutesBetween(@Nullable Time start, @Nullable Time end) {
-        if (start == null || end == null || start.getLocalTime() == null || end.getLocalTime() == null) {
+        if (start == null || end == null) {
             return null;
         }
-        return ChronoUnit.MINUTES.between(start.getLocalTime(), end.getLocalTime());
+
+        if (start.instant != null && end.instant != null) {
+            return ChronoUnit.MINUTES.between(start.instant, end.instant);
+        }
+
+        if (start.localTime != null && end.localTime != null) {
+            long diff = ChronoUnit.MINUTES.between(start.localTime, end.localTime);
+            if (diff < -720) {
+                diff += 1440;
+            } else if (diff > 720) {
+                diff -= 1440;
+            }
+            return diff;
+        }
+
+        return null;
     }
 
     // ==================== FORMATTAGE ====================
