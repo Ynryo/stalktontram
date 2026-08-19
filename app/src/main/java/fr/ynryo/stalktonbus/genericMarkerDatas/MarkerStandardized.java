@@ -124,6 +124,7 @@ public class MarkerStandardized {
         this.markerTrip.setDistanceTraveled(busTrackerVehicleDetails.getPosition().getDistanceTraveled());
 
         if (busTrackerVehicleDetails.getCalls().isEmpty()) return;
+        this.markerTrip.getStops().clear();
 
         for (int i = 0; i < busTrackerVehicleDetails.getCalls().size(); i++) { //calls = stops
             BusTrackerVehicleStopDetails busTrackerVehicleStopDetails = busTrackerVehicleDetails.getCalls().get(i);
