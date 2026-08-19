@@ -13,14 +13,17 @@
     <string name="compass_desc">Compass</string>
     <string name="back">Back</string>
     <string name="menu_filters">Filter transports</string>
-    <string name="menu_favorites_lines">Favorites bus lines</string>
-    <string name="menu_favorites_stops">Favorites bus stops</string>
-    <string name="menu_favorites_trains">Favorites trains</string>
+    <string name="menu_favorites_lines">Favorite bus lines</string>
+    <string name="menu_favorites_stops">Favorite bus stops</string>
+    <string name="menu_favorites_trains">Favorite trains</string>
     <string name="menu_credits">Credits and rules</string>
-    <string name="favorite_load_error">Error whilr fetching favorites datas</string>
+    <string name="follow_button_desc" translatable="false">Follow vehicle</string>
+    <string name="favorite_button_desc" translatable="false">Add line to favorites</string>
+    <string name="close_button_desc" translatable="false">Close detailed view</string>
+    <string name="favorite_load_error">Error while fetching favorites data: %s</string>
     <string name="expand_desc">Unfold</string>
     <string name="collapse_desc">Fold</string>
-    <string name="no_favorites_message">No favorites lines for the moment</string>
+    <string name="no_favorites_message">No favorite lines at the moment</string>
     <string name="next_stop_label">Next stop :</string>
     <string name="time_label">Time</string>
     <string name="city">City</string>

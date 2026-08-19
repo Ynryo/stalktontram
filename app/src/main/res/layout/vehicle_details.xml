@@ -2,14 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/followButton"
+        android:id="@+id/closeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/follow_button_desc"
-        android:src="@drawable/icon_distance"
+        android:contentDescription="@string/close_button_desc"
+        android:src="@drawable/icon_clear_route"
         app:backgroundTint="?attr/colorSurface"
         app:fabCustomSize="40dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,12 +21,26 @@
         android:id="@+id/favoriteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="12dp"
         android:contentDescription="@string/favorite_button_desc"
         android:src="@drawable/icon_favorite"
         app:backgroundTint="?attr/colorSurface"
         app:fabCustomSize="40dp"
-        app:layout_constraintEnd_toStartOf="@+id/followButton"
+        app:layout_constraintEnd_toStartOf="@+id/closeButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+        app:tint="?attr/colorOnSurface" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/followButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:contentDescription="@string/follow_button_desc"
+        android:src="@drawable/icon_distance"
+        app:backgroundTint="?attr/colorSurface"
+        app:fabCustomSize="40dp"
+        app:layout_constraintEnd_toStartOf="@+id/favoriteButton"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
         app:tint="?attr/colorOnSurface" />
@@ -34,16 +48,15 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nsvContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:background="?attr/colorSurface"
+        android:fillViewport="true"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHeight_max="550dp"
-        app:layout_constraintTop_toBottomOf="@id/followButton">
+        app:layout_constraintTop_toBottomOf="@id/closeButton">
 
         <LinearLayout
             android:layout_width="match_parent"

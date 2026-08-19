@@ -151,11 +151,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         findViewById(R.id.btn_open_menu).setOnClickListener(view -> lateralDrawerActivity.open());
         findViewById(R.id.fab_center_location).setOnClickListener(view -> centerMapOnUserLocation());
-        findViewById(R.id.fab_clear_route).setOnClickListener(view -> {
-            if (markerArtist != null && markerArtist.getRouteArtist() != null) {
-                markerArtist.getRouteArtist().remove();
-            }
-        });
     }
 
     private void onEverythingReady() {

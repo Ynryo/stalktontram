@@ -24,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.color.MaterialColors;
 
 import java.lang.ref.WeakReference;
@@ -43,6 +41,7 @@ import java.util.List;
 
 import fr.ynryo.stalktonbus.apiResponsesPOJO.guessPlatform.CartoTchooGuessPlatform;
 import fr.ynryo.stalktonbus.apiResponsesPOJO.network.BusTrackerNetworkData;
+import fr.ynryo.stalktonbus.artists.MarkerArtist;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStandardized;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStop;
 import fr.ynryo.stalktonbus.genericMarkerDatas.MarkerStopPlatform;
@@ -53,75 +52,91 @@ public class MarkerStopsDetailActivity {
     private static final String TAG = "MarkerStopsDetailActivity";
     private static final int COLOR_GREEN = Color.rgb(15, 150, 40);
     private final MainActivity context;
-    private BottomSheetDialog bottomSheetDialog;
+    private View bottomSheetView;
+    private BottomSheetBehavior<View> behavior;
     private String vehicleId;
 
     public MarkerStopsDetailActivity(MainActivity context) {
         WeakReference<MainActivity> contextRef = new WeakReference<>(context);
         this.context = contextRef.get();
+        initBottomSheet();
+    }
+
+    private void initBottomSheet() {
+        if (this.context == null) return;
+        bottomSheetView = context.findViewById(R.id.vehicle_bottom_sheet);
+        if (bottomSheetView != null) {
+            behavior = BottomSheetBehavior.from(bottomSheetView);
+            behavior.setHideable(true);
+            behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            behavior.setPeekHeight(calculatePeekHeight());
+
+            behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        vehicleId = null;
+                        if (context != null && context.getMarkerArtist() != null && context.getMarkerArtist().getRouteArtist() != null) {
+                            context.getMarkerArtist().getRouteArtist().remove();
+                        }
+                    }
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                }
+            });
+
+            View closeBtn = bottomSheetView.findViewById(R.id.closeButton);
+            if (closeBtn != null) {
+                closeBtn.setOnClickListener(v -> close());
+            }
+
+            ViewCompat.setOnApplyWindowInsetsListener(bottomSheetView, (v, windowInsets) -> {
+                Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                View nsvContent = bottomSheetView.findViewById(R.id.nsvContent);
+                if (nsvContent != null) {
+                    nsvContent.setPadding(nsvContent.getPaddingLeft(), nsvContent.getPaddingTop(), nsvContent.getPaddingRight(), insets.bottom + context.dpToPx(16));
+                    if (nsvContent instanceof NestedScrollView) {
+                        ((NestedScrollView) nsvContent).setClipToPadding(false);
+                    }
+                }
+                return windowInsets;
+            });
+        }
     }
 
     public void open(MarkerStandardized markerStandardized) {
         if (this.context == null) return;
-        close();
+        if (bottomSheetView == null || behavior == null) initBottomSheet();
+        if (bottomSheetView == null || behavior == null) return;
 
-        bottomSheetDialog = new BottomSheetDialog(context);
         vehicleId = markerStandardized.getId();
 
-        View view = LayoutInflater.from(context).inflate(R.layout.vehicle_details, null);
-        bottomSheetDialog.setContentView(view);
-        setupBottomSheetAppearance(view);
-        setupLineHeader(view, markerStandardized);
-        setupLoader(view, markerStandardized);
+        setupLineHeader(bottomSheetView, markerStandardized);
+        setupLoader(bottomSheetView, markerStandardized);
 
-        bottomSheetDialog.show();
-        fetchVehicleData(markerStandardized, view);
+        behavior.setPeekHeight(calculatePeekHeight());
+        behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+
+        fetchVehicleData(markerStandardized, bottomSheetView);
     }
 
     public void close() {
-        if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
-            bottomSheetDialog.dismiss();
-            bottomSheetDialog = null;
+        if (behavior != null) {
+            behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
-    }
-
-    // ==================== SETUP ====================
-    private void setupBottomSheetAppearance(View view) {
-        if (bottomSheetDialog.getWindow() != null) {
-            WindowCompat.setDecorFitsSystemWindows(bottomSheetDialog.getWindow(), false);
+        vehicleId = null;
+        
+        MarkerArtist markerArtist = context.getMarkerArtist();
+        if (markerArtist != null && markerArtist.getRouteArtist() != null) {
+            markerArtist.getRouteArtist().remove();
         }
-
-        bottomSheetDialog.setOnShowListener(dialog -> {
-            BottomSheetDialog d = (BottomSheetDialog) dialog;
-            View bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-
-            if (bottomSheet != null) {
-                bottomSheet.setBackgroundResource(android.R.color.transparent);
-                ViewCompat.setOnApplyWindowInsetsListener(bottomSheet, (v, insets) -> insets);
-                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
-
-                int peekHeight = calculatePeekHeight();
-                behavior.setPeekHeight(peekHeight);
-                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            }
-        });
-
-        ViewCompat.setOnApplyWindowInsetsListener(view, (v, windowInsets) -> {
-            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            View nsvContent = view.findViewById(R.id.nsvContent);
-            if (nsvContent != null && context != null) {
-                nsvContent.setPadding(nsvContent.getPaddingLeft(), nsvContent.getPaddingTop(), nsvContent.getPaddingRight(), insets.bottom + context.dpToPx(16));
-                if (nsvContent instanceof NestedScrollView) {
-                    ((NestedScrollView) nsvContent).setClipToPadding(false);
-                }
-            }
-            return windowInsets;
-        });
     }
 
     private int calculatePeekHeight() {
-        int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
-        return (int) (screenHeight * 0.5);
+        if (context == null) return 400;
+        return context.dpToPx(130);
     }
 
     private void setupLineHeader(View view, MarkerStandardized markerStandardized) {
@@ -153,7 +168,7 @@ public class MarkerStopsDetailActivity {
      * Fetch data from API
      *
      * @param markerStandardized the marker data
-     * @param view                   the view
+     * @param view               the view
      */
     private void fetchVehicleData(MarkerStandardized markerStandardized, View view) {
         context.getFetcher().fetchVehicleStopsInfo(markerStandardized, new FetchingManager.OnVehicleDetailsListener() {
@@ -181,7 +196,7 @@ public class MarkerStopsDetailActivity {
      * Fetch network logo from API
      *
      * @param markerStandardized the marker data
-     * @param view                   the view
+     * @param view               the view
      */
     private void fetchNetworkLogo(MarkerStandardized markerStandardized, View view) {
         if (markerStandardized.getNetworkId() == 0) return;
@@ -245,7 +260,7 @@ public class MarkerStopsDetailActivity {
      * Show vehicle details from marker data
      *
      * @param markerStandardized the marker data
-     * @param view                   the view
+     * @param view               the view
      */
     private void showVehicleDetails(MarkerStandardized markerStandardized, View view) {
         context.getFollowManager().setFollowButton(view.findViewById(R.id.followButton), markerStandardized.getId());
@@ -259,7 +274,7 @@ public class MarkerStopsDetailActivity {
     /**
      * Setup destination text from marker data
      *
-     * @param view                   the view
+     * @param view               the view
      * @param markerStandardized the marker data
      */
     private void setupDestinationText(View view, MarkerStandardized markerStandardized) {

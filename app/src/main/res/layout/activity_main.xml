@@ -12,87 +12,90 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btn_open_menu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="@string/open_menu"
-                android:src="@drawable/icon_menu"
-                app:backgroundTint="?attr/colorSecondary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorOnSecondary" />
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/compass"
+                    android:id="@+id/btn_open_menu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/compass_desc"
-                    app:backgroundTint="@color/surface_dark"
-                    app:fabCustomSize="40dp"
-                    app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
-                    app:tint="@null" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:contentDescription="@string/open_menu"
+                    android:src="@drawable/icon_menu"
+                    app:backgroundTint="?attr/colorSecondary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="?attr/colorOnSecondary" />
 
-                <ImageView
-                    android:id="@+id/compass_needle"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center"
-                    android:clickable="false"
-                    android:elevation="8dp"
-                    android:focusable="false"
-                    android:src="@drawable/compass_needle"
-                    android:translationZ="8dp" />
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/compass"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/compass_desc"
+                        app:backgroundTint="@color/surface_dark"
+                        app:fabCustomSize="40dp"
+                        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+                        app:tint="@null" />
+
+                    <ImageView
+                        android:id="@+id/compass_needle"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:clickable="false"
+                        android:elevation="8dp"
+                        android:focusable="false"
+                        android:src="@drawable/compass_needle"
+                        android:translationZ="8dp" />
+                </FrameLayout>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab_center_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:contentDescription="@string/center_map_on_loc"
+                    android:src="@drawable/icon_my_location"
+                    app:backgroundTint="?attr/colorPrimary"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:tint="?attr/colorOnPrimary" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/vehicle_bottom_sheet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+                app:behavior_hideable="true"
+                app:behavior_peekHeight="130dp">
+
+                <include layout="@layout/vehicle_details" />
             </FrameLayout>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_clear_route"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="12dp"
-                android:contentDescription="@string/clear_route_desc"
-                android:src="@drawable/icon_clear_route"
-                android:visibility="gone"
-                app:backgroundTint="?attr/colorSurface"
-                app:layout_constraintBottom_toTopOf="@id/fab_center_location"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:tint="?attr/colorOnSurface" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_center_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:contentDescription="@string/center_map_on_loc"
-                android:src="@drawable/icon_my_location"
-                app:backgroundTint="?attr/colorPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:tint="?attr/colorOnPrimary" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <LinearLayout
             android:id="@+id/navigation_view"

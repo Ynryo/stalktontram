@@ -12,7 +12,7 @@
     <string name="destination">Destination</string>
     <string name="_0" translatable="false">0</string>
     <string name="network_logo">Logo du réseau de transport</string>
-    <string name="compass_desc">Bousole</string>
+    <string name="compass_desc">Boussole</string>
     <string name="back">Retour</string>
     <string name="menu_filters">Filtrer les lignes</string>
     <string name="menu_favorites_lines">Lignes de bus favorites</string>
@@ -20,8 +20,9 @@
     <string name="menu_favorites_trains">Trains favoris</string>
     <string name="menu_credits">Crédits et règles</string>
     <string name="credits_content" translatable="false">Créé par <a href="https://github.com/Ynryo">Ynryo</a> dans le cadre d\'un projet scolaire\n\n Code source disponible sur <a href="https://github.com/Ynryo/ouestcefdpdetram">GitHub</a></string>
-    <string name="follow_button_desc" translatable="false">Bouton pour suivre le véhicle</string>
-    <string name="favorite_button_desc" translatable="false">Bouton pour ajouter la ligne au favoris</string>
+    <string name="follow_button_desc">Bouton pour suivre le véhicule</string>
+    <string name="favorite_button_desc">Bouton pour ajouter la ligne aux favoris</string>
+    <string name="close_button_desc">Fermer la vue détaillée</string>
     <string name="no_favorites_message">Aucune ligne favorite pour le moment.</string>
     <string name="next_stop_label">Prochain arrêt :</string>
     <string name="time_label">Heure</string>
@@ -41,7 +42,7 @@
         \n\n•\tVisualisation des Véhicules: Chaque icône indique la position actuelle d\'un
         véhicule, souvent avec son numéro de ligne et sa destination.
         \n\n•\tInformations Détaillées: Appuyez sur une icône de véhicule pour afficher une
-        fenêtre d\'information contenant des détails supplémentaires comme la prochaine arrêt,
+        fenêtre d\'information contenant des détails supplémentaires comme le prochain arrêt,
         l\'heure de départ estimée, et la destination finale.
     </string>
 
@@ -69,7 +70,7 @@
         sur la carte, puis sur l\'icône en forme de cœur ou d\'étoile dans la fenêtre d\'information
         du véhicule.
         \n\n•\tSuivi Rapide: Cette section affiche les véhicules des lignes que vous avez
-        marquées comme favorites, avec leurs prochaines arrêts et horaires, pour un suivi rapide.
+        marquées comme favorites, avec leurs prochains arrêts et horaires, pour un suivi rapide.
     </string>
 
     <string name="guide_useful_tips_title" translatable="false">3. Conseils Utiles</string>
