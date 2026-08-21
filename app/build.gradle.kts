@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "fr.ynryo.stalktonbus"
+    namespace = "fr.ynryo.spotted"
     compileSdk = 36
 
     defaultConfig {
@@ -20,7 +20,7 @@ android {
             "GOOGLE_MAPS_API_KEY" to (localProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: "")
         )
 
-        applicationId = "fr.ynryo.stalktonbus"
+        applicationId = "fr.ynryo.spotted"
         minSdk = 30
         targetSdk = 36
         versionName = "1.2.5"
