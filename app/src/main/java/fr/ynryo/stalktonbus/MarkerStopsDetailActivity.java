@@ -68,6 +68,8 @@ public class MarkerStopsDetailActivity {
         if (bottomSheetView != null) {
             behavior = BottomSheetBehavior.from(bottomSheetView);
             behavior.setHideable(true);
+            behavior.setFitToContents(false);
+            behavior.setExpandedOffset(context.dpToPx(84));
             behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             behavior.setPeekHeight(calculatePeekHeight());
 

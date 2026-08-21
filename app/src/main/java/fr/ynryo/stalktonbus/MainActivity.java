@@ -12,9 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -49,7 +50,6 @@ import fr.ynryo.stalktonbus.managers.favorite.FavoriteManager;
  */
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraMoveStartedListener {
     private static final String TAG = "MainActivity";
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final float DEFAULT_ZOOM = 13f;
     private static final LatLng PARIS = new LatLng(48.8566, 2.3522);
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -60,6 +60,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             fetchMarkers();
         }
     };
+
+    private final ActivityResultLauncher<String[]> locationPermissionRequest =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
+                Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
+                if ((fineLocationGranted != null && fineLocationGranted) || (coarseLocationGranted != null && coarseLocationGranted)) {
+                    if (this.googleMap != null) {
+                        try {
+                            this.googleMap.setMyLocationEnabled(true);
+                        } catch (SecurityException e) {
+                            Log.e(TAG, "SecurityException: " + e.getMessage());
+                        }
+                    }
+                    centerMapOnUserLocation();
+                } else {
+                    Log.d(TAG, "Permissions de localisation refusées");
+                }
+            });
 
     private LateralDrawerActivity lateralDrawerActivity;
     private FetchingManager fetcher;
@@ -167,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
         markerArtist.setGoogleMap(this.googleMap);
-        this.googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        this.googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         this.googleMap.setBuildingsEnabled(true);
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(PARIS, DEFAULT_ZOOM));
         this.googleMap.setOnCameraIdleListener(this);
@@ -179,10 +197,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.getUiSettings().setCompassEnabled(false);
         this.googleMap.getUiSettings().setMapToolbarEnabled(false);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        if (!hasLocationPermission()) {
+            locationPermissionRequest.launch(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            });
         } else {
-            this.googleMap.setMyLocationEnabled(true);
+            try {
+                this.googleMap.setMyLocationEnabled(true);
+            } catch (SecurityException e) {
+                Log.e(TAG, "SecurityException onMapReady: " + e.getMessage());
+            }
         }
 
         isMapReady = true;
@@ -257,20 +282,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
-            centerMapOnUserLocation();
-        }
+    private boolean hasLocationPermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void centerMapOnUserLocation() {
         if (googleMap == null) return;
 
-        //no position go paris
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!hasLocationPermission()) {
             Log.d(TAG, "Pas de permission - reste à Paris");
             return;
         }
@@ -288,9 +308,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .build()
                     ), 1000, null);
                 } else {
-                    Log.d(TAG, "getLastLocation() retourne null - reste à Paris"); //reste sur paris
+                    Log.d(TAG, "getLastLocation() retourne null - reste à Paris");
                 }
-            }).addOnFailureListener(e -> Log.e(TAG, "Erreur getLastLocation: " + e.getMessage())); //reste sur paris
+            }).addOnFailureListener(e -> Log.e(TAG, "Erreur getLastLocation: " + e.getMessage()));
+        } catch (SecurityException e) {
+            Log.e(TAG, "SecurityException centerMapOnUserLocation: " + e.getMessage());
         } catch (Exception e) {
             Log.e(TAG, "Exception centerMapOnUserLocation: " + e.getMessage());
         }

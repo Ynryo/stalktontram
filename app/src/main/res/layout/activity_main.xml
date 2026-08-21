@@ -90,6 +90,8 @@
                 android:layout_height="match_parent"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 app:behavior_hideable="true"
+                app:behavior_fitToContents="false"
+                app:behavior_expandedOffset="84dp"
                 app:behavior_peekHeight="130dp">
 
                 <include layout="@layout/vehicle_details" />
