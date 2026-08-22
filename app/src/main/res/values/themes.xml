@@ -11,6 +11,6 @@
         <item name="colorSurface">@color/surface_light</item>
     </style>
 
-    <style name="Theme.OùEstCeFdpDeTram" parent="Base.Theme.OùEstCeFdpDeTram" />
+    <style name="Theme.Spotted" parent="Base.Theme.OùEstCeFdpDeTram" />
 
 </resources>

@@ -36,8 +36,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            applicationIdSuffix = ".release"
-            versionNameSuffix = ".release"
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"

@@ -9,11 +9,11 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/tram"
+        android:icon="@mipmap/ic_spotted"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/tram"
+        android:roundIcon="@mipmap/ic_spotted_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.OùEstCeFdpDeTram">
+        android:theme="@style/Theme.Spotted">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="${GOOGLE_MAPS_API_KEY}" />
         <activity
             android:name=".MainActivity"
